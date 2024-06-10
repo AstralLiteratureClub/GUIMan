@@ -6,7 +6,6 @@ group = 'bet.astral'
 version = '1.0.0'
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven {
         name = "papermc-repo"
@@ -19,8 +18,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'bet.astral:messenger:2.0.0'
-    compileOnly 'bet.astral:messenger-paper:2.0.0'
     compileOnly "io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT"
 }
 
