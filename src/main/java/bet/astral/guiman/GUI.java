@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +21,10 @@ import java.util.function.Consumer;
 
 @Getter
 public final class GUI {
+	private static JavaPlugin plugin;
+	public static void init(@NotNull JavaPlugin plugin){
+		GUI.plugin = plugin;
+	}
 	@Getter(AccessLevel.NONE)
 	public static final Consumer<Player> empty_consumer = player -> {};
 	private final Map<Player, InteractableGUI> players = new HashMap<>();
@@ -107,16 +112,24 @@ public final class GUI {
 	}
 
 	@ApiStatus.NonExtendable
-	public void generateInventory(Player player){
-		if (shared){
-			player.openInventory(sharedGUI.getInventory());
+	public void generateInventory(Player player) {
+		if (shared) {
+			player.getScheduler().run(
+					plugin,
+					t -> {
+						player.openInventory(sharedGUI.getInventory());
+					}, null);
 		} else {
-			this.getPlayers().putIfAbsent(player, new InteractableGUI(this, player));
-			InteractableGUI gui = players.get(player);
-			if (regenerateItems){
-				gui.generate(player);
-			}
-			player.openInventory(this.getPlayers().get(player).getInventory());
+			player.getScheduler().run(
+					plugin,
+					t -> {
+						this.getPlayers().putIfAbsent(player, new InteractableGUI(this, player));
+						InteractableGUI gui = players.get(player);
+						if (regenerateItems) {
+							gui.generate(player);
+						}
+						player.openInventory(this.getPlayers().get(player).getInventory());
+					}, null);
 		}
 	}
 
