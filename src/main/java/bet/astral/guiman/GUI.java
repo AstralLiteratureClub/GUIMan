@@ -24,6 +24,7 @@ public final class GUI {
 	private static JavaPlugin plugin;
 	public static void init(@NotNull JavaPlugin plugin){
 		GUI.plugin = plugin;
+		plugin.getServer().getPluginManager().registerEvents(new InventoryListener(), plugin);
 	}
 	@Getter(AccessLevel.NONE)
 	public static final Consumer<Player> empty_consumer = player -> {};
