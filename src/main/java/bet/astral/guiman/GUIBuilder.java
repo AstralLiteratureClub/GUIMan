@@ -129,6 +129,7 @@ public class GUIBuilder {
 	}
 
 
+	@Deprecated(forRemoval = true)
 	public GUI createGUI() {
 		if (this.type == InventoryType.CHEST){
 			return new GUI(name, rows, background, clickable, closeConsumer, openConsumer, regenerateItems);
@@ -136,7 +137,8 @@ public class GUIBuilder {
 			return new GUI(name, type, background, clickable, closeConsumer, openConsumer, regenerateItems);
 		}
 	}
-	public GUI build(){
+
+	public InventoryGUI build(){
 		return createGUI();
 	}
 }
