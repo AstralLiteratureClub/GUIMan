@@ -1,1 +1,3 @@
-rootProject.name = 'GUIMan'
+rootProject.name = 'guiman'
+include 'SignMan'
+

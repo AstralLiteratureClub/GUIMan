@@ -2,6 +2,7 @@ package bet.astral.guiman;
 
 import bet.astral.guiman.permission.Permission;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -39,9 +40,7 @@ public class ClickableBuilder implements Cloneable {
 	}
 	public ClickableBuilder(@NotNull Material material, @NotNull Consumer<ItemMeta> itemMeta){
 		itemStack = new ItemStack(material);
-		ItemMeta meta = itemStack.getItemMeta();
-		itemMeta.accept(meta);
-		itemStack.setItemMeta(meta);
+		itemStack.editMeta(itemMeta);
 	}
 	public ClickableBuilder setPriority(int priority) {
 		this.priority = priority;

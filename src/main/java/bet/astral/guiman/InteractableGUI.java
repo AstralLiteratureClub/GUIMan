@@ -18,10 +18,10 @@ import java.util.List;
 
 @ApiStatus.Internal
 public class InteractableGUI implements InventoryHolder {
-	private final GUI gui;
+	private final InventoryGUI gui;
 	private final Inventory inventory;
 
-	public InteractableGUI(GUI gui) {
+	public InteractableGUI(InventoryGUI gui) {
 		this.gui = gui;
 		if (gui.getType() == InventoryType.CHEST){
 			if (gui.getName() == null) {
@@ -38,7 +38,7 @@ public class InteractableGUI implements InventoryHolder {
 		}
 		generate(null);
 	}
-	public InteractableGUI(GUI gui, Player player) {
+	public InteractableGUI(InventoryGUI gui, Player player) {
 		this.gui = gui;
 		if (gui.getType() == InventoryType.CHEST){
 			if (gui.getName() == null) {
@@ -88,7 +88,7 @@ public class InteractableGUI implements InventoryHolder {
 		return itemStack;
 	}
 
-	public GUI getCore(){
+	public InventoryGUI getCore(){
 		return gui;
 	}
 

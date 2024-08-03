@@ -22,7 +22,7 @@ public class InventoryListener implements Listener {
 		if (event.getInventory().getHolder() instanceof InteractableGUI interactableGUI){
 			event.setCancelled(true);
 			ItemStack itemStack = event.getCurrentItem();
-			GUI gui = interactableGUI.getCore();
+			InventoryGUI gui = interactableGUI.getCore();
 			int id = gui.getId(itemStack);
 			if (id == Clickable.empty_air.getId()){
 				return;
@@ -56,7 +56,7 @@ public class InventoryListener implements Listener {
 				return;
 			}
 			ItemStack itemStack = null;
-			GUI gui = interactableGUI.getCore();
+			InventoryGUI gui = interactableGUI.getCore();
 			int id = gui.getId(itemStack);
 			if (id == Clickable.empty_air.getId()){
 				return;
