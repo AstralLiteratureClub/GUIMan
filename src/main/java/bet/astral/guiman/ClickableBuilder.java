@@ -42,6 +42,10 @@ public class ClickableBuilder implements Cloneable {
 		itemStack = new ItemStack(material);
 		itemStack.editMeta(itemMeta);
 	}
+	public <Meta extends ItemMeta> ClickableBuilder(@NotNull Material material, @NotNull Consumer<Meta> itemMeta, Class<Meta> meta){
+		itemStack = new ItemStack(material);
+		itemStack.editMeta(meta, itemMeta);
+	}
 	public ClickableBuilder setPriority(int priority) {
 		this.priority = priority;
 		return this;
