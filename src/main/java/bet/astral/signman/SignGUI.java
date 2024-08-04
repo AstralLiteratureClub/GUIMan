@@ -13,7 +13,7 @@ import java.util.List;
 
 @Getter
 public class SignGUI {
-	private static Handler packetHandler;
+	protected static Handler packetHandler;
 	public static void init(JavaPlugin plugin, boolean async){
 		packetHandler = new Handler(plugin, async);
 	}

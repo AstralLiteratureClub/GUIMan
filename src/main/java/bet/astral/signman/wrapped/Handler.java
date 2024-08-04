@@ -1,9 +1,11 @@
 package bet.astral.signman.wrapped;
 
 import bet.astral.signman.SignGUI;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@Getter
 public class Handler {
 	private final JavaPlugin plugin;
 	private final PacketInjector packetInjector;
