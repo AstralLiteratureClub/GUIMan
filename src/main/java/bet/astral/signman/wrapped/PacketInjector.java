@@ -67,6 +67,8 @@ public class PacketInjector {
 		if (location.getY()<location.getWorld().getMinHeight()){
 			location.add(0, 4, 0);
 		}
+		gui.getOpenConsumer().accept(player);
+
 		BlockPos pos = CraftLocation.toBlockPosition(location);
 		ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
 

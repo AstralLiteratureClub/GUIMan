@@ -4,10 +4,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.DyeColor;
+import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class SignGUIBuilder {
 	private SignMaterial material = SignMaterial.OAK;
@@ -16,6 +18,7 @@ public class SignGUIBuilder {
 	private DyeColor color = DyeColor.BLACK;
 	private SignHandler handler;
 	private final ComponentSerializer<? extends Component, ? extends Component, String> componentSerializer;
+	private Consumer<Player> openConsumer = null;
 
 	public SignGUIBuilder(ComponentSerializer<? extends Component, ? extends Component, String> componentSerializer) {
 		this.componentSerializer = componentSerializer;
@@ -88,7 +91,12 @@ public class SignGUIBuilder {
 		return this;
 	}
 
+	public SignGUIBuilder setOpenConsumer(Consumer<Player> openConsumer) {
+		this.openConsumer = openConsumer;
+		return this;
+	}
+
 	public SignGUI build() {
-		return new SignGUI(material, signSize, lines.values().stream().toList(), color, handler, componentSerializer);
+		return new SignGUI(material, signSize, lines.values().stream().toList(), color, handler, componentSerializer, openConsumer);
 	}
 }

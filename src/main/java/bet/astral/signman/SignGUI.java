@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Getter
 public class SignGUI {
@@ -23,14 +24,16 @@ public class SignGUI {
 	private final DyeColor color;
 	private final SignHandler handler;
 	private final ComponentSerializer<? extends Component, ? extends Component, String> serializer;
+	private final Consumer<Player> openConsumer;
 
-	public SignGUI(SignMaterial material, SignSize signSize, List<Component> lines, DyeColor color, SignHandler handler, ComponentSerializer<? extends Component, ? extends Component, String> serializer) {
+	public SignGUI(SignMaterial material, SignSize signSize, List<Component> lines, DyeColor color, SignHandler handler, ComponentSerializer<? extends Component, ? extends Component, String> serializer, Consumer<Player> openConsumer) {
 		this.material = material;
 		this.signSize = signSize;
 		this.lines = lines;
 		this.color = color;
 		this.handler = handler;
 		this.serializer = serializer;
+		this.openConsumer = openConsumer;
 	}
 
 	public void open(Player player) {
