@@ -41,7 +41,7 @@ public class PacketHandler extends ChannelDuplexHandler {
 					if (success)
 						PACKET_HANDLERS.remove(p.getUniqueId()); // If successful, remove the packet handler
 				}
-			}; // Execute your Predicate Handler on the Synchronous Thread
+			};
 			if (async()) {
 				runnable.runTaskAsynchronously(getPlugin());
 			} else {

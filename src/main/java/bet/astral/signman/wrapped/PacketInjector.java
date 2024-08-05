@@ -110,7 +110,7 @@ public class PacketInjector {
 				for (String line : lines){
 					components.add(gui.getSerializer().deserialize(line));
 				}
-				gui.accept(player, new SignResult(components.toArray(Component[]::new)));
+				gui.accept(player, new SignResult(components));
 			}
 			return true;
 		});

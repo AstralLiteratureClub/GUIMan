@@ -1,28 +1,57 @@
 package bet.astral.signman;
 
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Contract;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
-public record SignResult(Component[] lines) {
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+public class SignResult {
+	private final List<Component> lines;
+	private final List<String> plainLines;
+
+	public SignResult(@NotNull List<Component> components) {
+		this.lines = components;
+		this.plainLines = new ArrayList<>();
+		for (Component component : components){
+			plainLines.add(PlainTextComponentSerializer.plainText().serialize(component));
+		}
+	}
+
 	@NotNull
-	@Contract(pure = true)
-	Component line0() {
-		return lines[0];
+	public Component getFirst(){
+		return lines.getFirst();
 	}
 	@NotNull
-	@Contract(pure = true)
-	Component line1(){
-		return lines[1];
+	public Component getSecond(){
+		return lines.get(1);
 	}
 	@NotNull
-	@Contract(pure = true)
-	Component line2(){
-		return lines[2];
+	public Component getThird(){
+		return lines.get(2);
 	}
 	@NotNull
-	@Contract(pure = true)
-	Component line3(){
-		return lines[3];
+	public Component getFourth(){
+		return lines.get(3);
+	}
+
+	@NotNull
+	public String getFirstPlain(){
+		return plainLines.getFirst();
+	}
+	@NotNull
+	public String getSecondPlain(){
+		return plainLines.get(1);
+	}
+	@NotNull
+	public String getThirdPlain(){
+		return plainLines.get(2);
+	}
+	@NotNull
+	public String getFourthPlain(){
+		return plainLines.get(3);
 	}
 }

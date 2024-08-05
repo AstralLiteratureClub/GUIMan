@@ -24,6 +24,6 @@ public enum SignMaterial {
 	}
 
 	public Material getMaterial(SignSize signSize){
-		return signSize==SignSize.HANGING ? hangingMaterial : normalMaterial;
+		return signSize==SignSize.SMALL ? hangingMaterial : normalMaterial;
 	}
 }

@@ -41,6 +41,6 @@ public class SignGUI {
 	}
 
 	public void accept(Player player, SignResult signResult) {
-		handler.handle(player, signResult).forEach(action->action.run(player, Arrays.asList(signResult.lines())));
+		handler.handle().forEach(action->action.run(player, signResult));
 	}
 }

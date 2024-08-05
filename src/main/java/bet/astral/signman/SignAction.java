@@ -1,11 +1,9 @@
 package bet.astral.signman;
 
 import bet.astral.guiman.InventoryGUI;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -21,12 +19,12 @@ public interface SignAction {
 		return (player, lines) -> gui.open(player);
 	}
 
-	default SignAction run(BiFunction<Player, List<Component>, ?> function){
+	default SignAction run(BiFunction<Player, SignResult, ?> function){
 		return (function::apply);
 	}
-	default SignAction run(BiConsumer<Player, List<Component>> consumer){
+	default SignAction run(BiConsumer<Player, SignResult> consumer){
 		return (consumer::accept);
 	}
 
-	void run(Player player, List<Component> lines);
+	void run(Player player, SignResult result);
 }
