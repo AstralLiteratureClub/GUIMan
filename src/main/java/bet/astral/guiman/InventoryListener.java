@@ -24,9 +24,11 @@ public class InventoryListener implements Listener {
 			ItemStack itemStack = event.getCurrentItem();
 			InventoryGUI gui = interactableGUI.getCore();
 			int id = gui.getId(itemStack);
-			if (id == Clickable.empty_air.getId()){
+			if (id == Clickable.EMPTY.getId()){
 				return;
 			}
+
+
 			Clickable clickable = gui.getIds().get(id);
 			if (clickable == null){
 				return;
@@ -58,7 +60,7 @@ public class InventoryListener implements Listener {
 			ItemStack itemStack = null;
 			InventoryGUI gui = interactableGUI.getCore();
 			int id = gui.getId(itemStack);
-			if (id == Clickable.empty_air.getId()){
+			if (id == Clickable.EMPTY.getId()){
 				return;
 			}
 			Clickable clickable = gui.getIds().get(id);

@@ -29,7 +29,9 @@ public final class Clickable implements Comparable<Clickable>{
 	public static final Random random = new Random(System.nanoTime());
 	@Deprecated(forRemoval = true)
 	public static final Permission none = Permission.none;
-	public static final Clickable empty_air = new ClickableBuilder(Material.AIR).setPriority(0).setPermission(none).setDisplayIfNoPermissions(true).createClickable();
+	public static final Clickable EMPTY = new ClickableBuilder(Material.AIR).setPriority(0).setPermission(none).setDisplayIfNoPermissions(true).createClickable();
+	@Deprecated(forRemoval = true)
+	public static final Clickable empty_air = EMPTY;
 	public static final Component permissionMessage = Component.text("Sorry, but you do not have permissions to use this", NamedTextColor.RED);
 	private final int priority;
 	@NotNull
