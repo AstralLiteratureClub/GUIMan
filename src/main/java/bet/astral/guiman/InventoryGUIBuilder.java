@@ -107,18 +107,22 @@ public class InventoryGUIBuilder {
 		this.clickable.put(slot, clickables);
 		return this;
 	}
-
+	@Deprecated(forRemoval = true)
 	public InventoryGUIBuilder setClickable(@NotNull Map<@NotNull Integer, @NotNull List<@NotNull Clickable>> clickable) {
+		return setClickables(clickable);
+	}
+
+	public InventoryGUIBuilder setClickables(@NotNull Map<@NotNull Integer, @NotNull List<@NotNull Clickable>> clickable) {
 		this.clickable = clickable;
 		return this;
 	}
 
-	public InventoryGUIBuilder setCloseConsumer(@NotNull Consumer<@NotNull Player> closeConsumer) {
+	public InventoryGUIBuilder setCloseConsumer(@Nullable Consumer<@NotNull Player> closeConsumer) {
 		this.closeConsumer = closeConsumer;
 		return this;
 	}
 
-	public InventoryGUIBuilder setOpenConsumer(@NotNull Consumer<@NotNull Player> openConsumer) {
+	public InventoryGUIBuilder setOpenConsumer(@Nullable Consumer<@NotNull Player> openConsumer) {
 		this.openConsumer = openConsumer;
 		return this;
 	}
