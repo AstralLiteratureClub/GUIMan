@@ -68,16 +68,18 @@ public class InventoryGUIBuilder {
 	public InventoryGUIBuilder setSlotClickableBuilders(int slot, @NotNull List<@NotNull ClickableBuilder> clickable){
 		List<Clickable> clickables = new ArrayList<>();
 		for (ClickableBuilder b : clickable){
-			clickables.add(b.createClickable());
+			clickables.add(b.build());
 		}
 		this.clickable.put(slot, clickables);
 		return this;
 	}
 	public InventoryGUIBuilder setSlotClickable(int slot, Clickable clickable){
+		this.clickable.remove(slot);
 		this.clickable.put(slot, List.of(clickable));
 		return this;
 	}
 	public InventoryGUIBuilder setSlotClickable(int slot, ClickableBuilder clickable){
+		this.clickable.remove(slot);
 		this.clickable.put(slot, List.of(clickable.build()));
 		return this;
 	}
@@ -139,10 +141,13 @@ public class InventoryGUIBuilder {
 			return new GUI(name, rows, background, clickable, closeConsumer, openConsumer, regenerateItems);
 		} else {
 			return new GUI(name, type, background, clickable, closeConsumer, openConsumer, regenerateItems);
-		}
-	}
+		}	}
 
 	public InventoryGUI build(){
-		return createGUI();
+		if (this.type == InventoryType.CHEST){
+			return new InventoryGUI(name, rows, background, clickable, closeConsumer, openConsumer, regenerateItems);
+		} else {
+			return new InventoryGUI(name, type, background, clickable, closeConsumer, openConsumer, regenerateItems);
+		}
 	}
 }
