@@ -30,6 +30,7 @@ public class ClickableBuilder implements Cloneable {
 	private boolean displayIfNoPermissions;
 	private @Nullable Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions;
 	private @Nullable Map<String, Object> data;
+	private boolean async = true;
 
 	public ClickableBuilder(@NotNull ItemStack itemStack) {
 		this.itemStack = itemStack;
@@ -69,7 +70,6 @@ public class ClickableBuilder implements Cloneable {
 		}
 		return null;
 	}
-
 
 	public ClickableBuilder setItemStack(@NotNull ItemStack itemStack) {
 		this.itemStack = itemStack;
@@ -138,20 +138,33 @@ public class ClickableBuilder implements Cloneable {
 		return this;
 	}
 
+	public ClickableBuilder setAsync(boolean async) {
+		this.async = async;
+		return this;
+	}
+
 	@Deprecated
 	public Clickable createClickable() {
 		return build();
 	}
 
 	public Clickable build(){
-		Clickable clickable =  new Clickable(priority, itemStack, permission != null ? permission : Permission.none, displayIfNoPermissions, actions != null ? actions : Collections.emptyMap());
+		Clickable clickable =  new Clickable(priority, itemStack, permission != null ? permission : Permission.none, displayIfNoPermissions, actions != null ? actions : Collections.emptyMap(), async);
 		clickable.setData(data);
 		return clickable;
 	}
 
 	@Override
 	public ClickableBuilder clone(){
-		return new ClickableBuilder(itemStack).setPriority(priority).setPermission(permission).setDisplayIfNoPermissions(displayIfNoPermissions).setActions(actions).setData(data);
+		ClickableBuilder builder = new ClickableBuilder(itemStack);
+		builder.priority = priority;
+		builder.itemStack = itemStack;
+		builder.permission = permission;
+		builder.displayIfNoPermissions = displayIfNoPermissions;
+		builder.actions = actions;
+		builder.data = data;
+		builder.async = async;
+		return builder;
 	}
 
 }

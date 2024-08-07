@@ -44,6 +44,7 @@ public final class Clickable implements Comparable<Clickable>{
 	private final Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions;
 	@Getter
 	private final int id = random.nextInt();
+	private final boolean isAsync;
 
 	@Contract("_, _, _, _, _, _ -> new")
 	public static @NotNull Clickable createSendMessageClickable(int priority, @NotNull ItemStack itemStack, @NotNull Permission permission, boolean displayIfNoPermissions, Component message, @NotNull List<@NotNull ClickType> allowedClickTypes){
@@ -105,20 +106,22 @@ public final class Clickable implements Comparable<Clickable>{
 		return new ClickableBuilder(itemStack).setGeneralAction(action).build();
 	}
 
-	public Clickable(int priority, @NotNull ItemStack itemStack, @NotNull Permission permission, boolean displayIfNoPermissions, @NotNull Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions) {
+	public Clickable(int priority, @NotNull ItemStack itemStack, @NotNull Permission permission, boolean displayIfNoPermissions, @NotNull Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions, boolean isAsync) {
 		this.priority = priority;
 		this.actions = actions;
 		this.itemStack = itemStack;
 		this.permission = permission;
 		this.displayIfNoPermissions = displayIfNoPermissions;
+		this.isAsync = isAsync;
 		generateIds();
 	}
 
-	public Clickable(int priority, @NotNull ItemStack itemStack, boolean displayIfNoPermissions, @NotNull Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions) {
+	public Clickable(int priority, @NotNull ItemStack itemStack, boolean displayIfNoPermissions, @NotNull Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions, boolean isAsync) {
 		this.priority = priority;
 		this.actions = actions;
 		this.itemStack = itemStack;
 		this.displayIfNoPermissions = displayIfNoPermissions;
+		this.isAsync = isAsync;
 		this.permission = none;
 		generateIds();
 	}
