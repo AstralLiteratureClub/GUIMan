@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import java.util.function.Predicate;
 
 public interface Permission {
-	Permission none = new NonePermission();
+	Permission NONE = new NonePermission();
 	static Permission of(String permission){
 		return new BukkitPermission(permission);
 	}

@@ -1,153 +1,260 @@
 package bet.astral.guiman;
 
+import bet.astral.guiman.background.Background;
+import bet.astral.guiman.background.builders.BackgroundBuilder;
+import bet.astral.guiman.background.Backgrounds;
+import bet.astral.guiman.clickable.Clickable;
+import bet.astral.guiman.clickable.ClickableLike;
+import bet.astral.messenger.v2.Messenger;
+import bet.astral.messenger.v2.placeholder.PlaceholderList;
+import bet.astral.messenger.v2.translation.TranslationKey;
 import net.kyori.adventure.text.Component;
+import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class InventoryGUIBuilder {
-	private @Nullable Component name;
-	private @NotNull InventoryType type;
-	private @Nullable Clickable background;
-	private @NotNull Map<@NotNull Integer, @NotNull List<@NotNull Clickable>> clickable = new HashMap<>();
-	private @Nullable Consumer<@NotNull Player> closeConsumer;
-	private @Nullable Consumer<@NotNull Player> openConsumer;
+	private Component name;
+	private final InventoryType type;
+	private Background background;
+	private final Map<@NotNull Integer, @NotNull Collection<@NotNull ClickableLike>> clickables = new HashMap<>();
+	private Consumer<@NotNull Player> closeConsumer;
+	private Consumer<@NotNull Player> openConsumer;
 	private boolean regenerateItems = false;
-	private int rows;
+	private final ChestRows rows;
+	private TranslationKey titleTranslation;
+	private Function<Player, PlaceholderList> placeholderGenerator = (p)->new PlaceholderList();
+	private Messenger messenger;
 
-	public InventoryGUIBuilder(int rows){
+	/**
+	 * Creates chest inventory gui builder. Chest inventories is the most supported inventory type of GUIMan
+	 * @param rows how many rows
+	 */
+	public InventoryGUIBuilder(@Range(from = 1, to = 6) int rows){
+		this.type = InventoryType.CHEST;
+		this.rows = ChestRows.rows(rows);
+	}
+	/**
+	 * Creates chest inventory gui builder. Chest inventories is the most supported inventory type of GUIMan
+	 * @param rows how many rows
+	 */
+	public InventoryGUIBuilder(ChestRows rows){
 		this.type = InventoryType.CHEST;
 		this.rows = rows;
 	}
-	public InventoryGUIBuilder(InventoryType type){
+
+	/**
+	 * Creates a custom inventory gui specified using {@link InventoryType type}
+	 * @param type inventoryType
+	 */
+	public InventoryGUIBuilder(InventoryType type) throws IllegalArgumentException{
+		switch (type){
+			case PLAYER, JUKEBOX, CHISELED_BOOKSHELF, CREATIVE, MERCHANT, DECORATED_POT, COMPOSTER ->{
+				throw new IllegalArgumentException("Cannot use inventory type "+ type.name()+" as inventory type!");
+			}
+		}
 		this.type = type;
-		this.rows = type.getDefaultSize();
+		this.rows = null;
 	}
 
-	public InventoryGUIBuilder name(@Nullable Component name) {
+	/**
+	 * Sets the title of the inventory to given component
+	 * @param name title of inventory
+	 * @return this
+	 */
+	@ApiStatus.Obsolete
+	public InventoryGUIBuilder title(@Nullable Component name) {
 		this.name = name;
 		return this;
 	}
-
-	public InventoryGUIBuilder type(@NotNull InventoryType type) {
-		this.type = type;
-		this.rows = 0;
+	/**
+	 * Sets the title of the inventory to the given component
+	 * Modern way to parse the title before opening inventory to the player.
+	 * @param name title of inventory
+	 * @return this
+	 */
+	public InventoryGUIBuilder title(@NotNull TranslationKey name) {
+		this.name = Component.translatable(name);
+		this.titleTranslation = name;
 		return this;
 	}
-	public InventoryGUIBuilder chestType(int rows) {
-		this.type = InventoryType.CHEST;
-		this.rows = rows;
+
+	/**
+	 * Sets the messenger used to generate components when generating inventory of players
+	 * @param messenger messenger
+	 * @return this
+	 */
+	public InventoryGUIBuilder messenger(@NotNull Messenger messenger){
+		this.messenger = messenger;
 		return this;
 	}
 
-	public InventoryGUIBuilder setBackground(@Nullable Clickable background) {
+	public InventoryGUIBuilder placeholderGenerator(@NotNull Function<Player, PlaceholderList> generator){
+		this.placeholderGenerator = generator;
+		return this;
+	}
+
+	/**
+	 * Sets the background displayed, for slots which don't have a clickable
+	 * @param backgroundBuilder background
+	 * @return this
+	 */
+	@Contract("_ -> this")
+	@NotNull
+	public InventoryGUIBuilder background(@Nullable BackgroundBuilder backgroundBuilder) {
+		if (backgroundBuilder == null){
+			this.background = Backgrounds.EMPTY;
+			return this;
+		}
+		Background background = backgroundBuilder.build();
+		if (background == null){
+			this.background = Backgrounds.EMPTY;
+			return this;
+		}
 		this.background = background;
 		return this;
 	}
-	public InventoryGUIBuilder setBackground(@Nullable ClickableBuilder background) {
+
+	/**
+	 * Sets the background displayed, for slots which don't have a clickable
+	 * @param background background
+	 * @return this
+	 */
+	@Contract("_ -> this")
+	@NotNull
+	public InventoryGUIBuilder background(@Nullable Background background) {
 		if (background == null){
-			this.background = null;
+			this.background = Backgrounds.EMPTY;
 			return this;
 		}
-		this.background = background.build();
+		this.background = background;
 		return this;
 	}
-	public InventoryGUIBuilder setSlotClickable(int slot, @NotNull List<@NotNull Clickable> clickable){
-		this.clickable.put(slot, clickable);
+
+	public InventoryGUIBuilder clickable(int slot, @NotNull ClickableLike clickable){
+		return clickable(slot, List.of(clickable));
+	}
+	public InventoryGUIBuilder clickable(int slot, @NotNull Collection<? extends @NotNull ClickableLike> clickables){
+		this.clickables.put(slot, new LinkedList<>(clickables));
 		return this;
 	}
-	public InventoryGUIBuilder setSlotClickableBuilders(int slot, @NotNull List<@NotNull ClickableBuilder> clickable){
-		List<Clickable> clickables = new ArrayList<>();
-		for (ClickableBuilder b : clickable){
-			clickables.add(b.build());
+	public InventoryGUIBuilder clickable(int[] slots, @NotNull Collection<? extends @NotNull ClickableLike> clickables){
+		for (int slot : slots){
+			clickable(slot, clickables);
 		}
-		this.clickable.put(slot, clickables);
 		return this;
 	}
-	public InventoryGUIBuilder setSlotClickable(int slot, Clickable clickable){
-		this.clickable.remove(slot);
-		this.clickable.put(slot, List.of(clickable));
+	public InventoryGUIBuilder clickable(int[] slots, @NotNull ClickableLike clickable){
+		for (int slot : slots){
+			clickable(slot, clickable);
+		}
 		return this;
 	}
-	public InventoryGUIBuilder setSlotClickable(int slot, ClickableBuilder clickable){
-		this.clickable.remove(slot);
-		this.clickable.put(slot, List.of(clickable.build()));
+	public InventoryGUIBuilder clickable(Collection<Integer> slots, @NotNull ClickableLike clickable){
+		for (int slot : slots){
+			clickable(slot, clickable);
+		}
 		return this;
 	}
-	public InventoryGUIBuilder addSlotClickable(int slot, Clickable clickable){
-		List<Clickable> clickables = this.clickable.get(slot) != null ? new ArrayList<>(this.clickable.get(slot)) : new ArrayList<>();
-		clickables.add(clickable);
-		this.clickable.put(slot, clickables);
-		return this;
-	}
-	public InventoryGUIBuilder addSlotClickable(int slot, ClickableBuilder clickable){
-		List<Clickable> clickables = this.clickable.get(slot) != null ? new ArrayList<>(this.clickable.get(slot)) : new ArrayList<>();
-		clickables.add(clickable.build());
-		this.clickable.put(slot, clickables);
+	public InventoryGUIBuilder clickable(Collection<Integer> slots, @NotNull Collection<? extends @NotNull ClickableLike> clickables){
+		for (int slot : slots){
+			clickable(slot, clickables);
+		}
 		return this;
 	}
 
-
-	public InventoryGUIBuilder addSlotEmpty(int slot, Material material){
-		List<Clickable> clickables = this.clickable.get(slot) != null ? new ArrayList<>(this.clickable.get(slot)) : new ArrayList<>();
-		clickables.add(Clickable.empty(new ItemStack(material)));
-		this.clickable.put(slot, clickables);
-		return this;
+	public InventoryGUIBuilder clickableGeneral(int slot, ItemStack itemStack, TriConsumer<Clickable, ItemStack, Player> action){
+		return clickable(slot, Clickable.general(itemStack, action));
 	}
-	public InventoryGUIBuilder addSlotEmpty(int slot, ItemStack itemstack){
-		List<Clickable> clickables = this.clickable.get(slot) != null ? new ArrayList<>(this.clickable.get(slot)) : new ArrayList<>();
-		clickables.add(Clickable.empty(itemstack));
-		this.clickable.put(slot, clickables);
-		return this;
+	public <Meta extends ItemMeta> InventoryGUIBuilder clickableGeneral(int slot, Material material, Consumer<Meta> meta, Class<Meta> metaType, TriConsumer<Clickable, ItemStack, Player> action){
+		return clickable(slot, Clickable.builder(material, meta, metaType).actionGeneral(action));
 	}
-	@Deprecated(forRemoval = true)
-	public InventoryGUIBuilder setClickable(@NotNull Map<@NotNull Integer, @NotNull List<@NotNull Clickable>> clickable) {
-		return setClickables(clickable);
+	public InventoryGUIBuilder clickableGeneral(int slot, Material material, Consumer<ItemMeta> meta, TriConsumer<Clickable, ItemStack, Player> action){
+		return clickable(slot, Clickable.builder(material, meta).actionGeneral(action));
+	}
+	public InventoryGUIBuilder clickableGeneral(int slot, Material material, TriConsumer<Clickable, ItemStack, Player> action){
+		return clickable(slot, Clickable.builder(material).actionGeneral(action));
 	}
 
-	public InventoryGUIBuilder setClickables(@NotNull Map<@NotNull Integer, @NotNull List<@NotNull Clickable>> clickable) {
-		this.clickable = clickable;
+	public InventoryGUIBuilder addClickable(int slot, @NotNull ClickableLike clickable){
+		return addClickable(slot, List.of(clickable));
+	}
+	public InventoryGUIBuilder addClickable(int slot, @NotNull Collection<? extends @NotNull ClickableLike> clickables){
+		if (this.clickables.get(slot) == null){
+			this.clickables.put(slot, new LinkedList<>(clickables));
+			return this;
+		}
+		add(this.clickables.get(slot), clickables);
 		return this;
 	}
+	public InventoryGUIBuilder addClickable(int[] slots, @NotNull Collection<? extends @NotNull ClickableLike> clickables){
+		for (int slot : slots){
+			addClickable(slot, clickables);
+		}
+		return this;
+	}
+	public InventoryGUIBuilder addClickable(int[] slots, @NotNull ClickableLike clickable){
+		for (int slot : slots){
+			addClickable(slot, clickable);
+		}
+		return this;
+	}
+	public InventoryGUIBuilder addClickable(Collection<Integer> slots, @NotNull ClickableLike clickable){
+		for (int slot : slots){
+			addClickable(slot, clickable);
+		}
+		return this;
+	}
+	public InventoryGUIBuilder addClickable(Collection<Integer> slots, @NotNull Collection<? extends @NotNull ClickableLike> clickables){
+		for (int slot : slots){
+			addClickable(slot, clickables);
+		}
+		return this;
+	}
+	private void add(Collection<ClickableLike> base, Collection<? extends ClickableLike> adding){
+		base.addAll(adding);
+	}
 
-	public InventoryGUIBuilder setCloseConsumer(@Nullable Consumer<@NotNull Player> closeConsumer) {
+	public InventoryGUIBuilder closeConsumer(@Nullable Consumer<@NotNull Player> closeConsumer) {
 		this.closeConsumer = closeConsumer;
 		return this;
 	}
 
-	public InventoryGUIBuilder setOpenConsumer(@Nullable Consumer<@NotNull Player> openConsumer) {
+	public InventoryGUIBuilder openConsumer(@Nullable Consumer<@NotNull Player> openConsumer) {
 		this.openConsumer = openConsumer;
 		return this;
 	}
 
-	public InventoryGUIBuilder replaceItemsEachOpen(boolean regenerate) {
-		this.regenerateItems = regenerate;
+	public InventoryGUIBuilder replaceItemsEachOpen() {
+		this.regenerateItems = true;
 		return this;
 	}
 
 
-	@Deprecated(forRemoval = true)
-	public GUI createGUI() {
-		if (this.type == InventoryType.CHEST){
-			return new GUI(name, rows, background, clickable, closeConsumer, openConsumer, regenerateItems);
-		} else {
-			return new GUI(name, type, background, clickable, closeConsumer, openConsumer, regenerateItems);
-		}	}
-
 	public InventoryGUI build(){
+		if (messenger == null){
+			throw new RuntimeException("No messenger foúnd");
+		}
 		if (this.type == InventoryType.CHEST){
-			return new InventoryGUI(name, rows, background, clickable, closeConsumer, openConsumer, regenerateItems);
+			if (titleTranslation != null){
+				return new InventoryGUI(titleTranslation, placeholderGenerator, messenger, InventoryType.CHEST, rows.getSlots(), background, clickables, closeConsumer, openConsumer, regenerateItems);
+			} else {
+				return new InventoryGUI(name, InventoryType.CHEST, rows.getSlots(), background, clickables, closeConsumer, openConsumer, regenerateItems, messenger);
+			}
 		} else {
-			return new InventoryGUI(name, type, background, clickable, closeConsumer, openConsumer, regenerateItems);
+			if (titleTranslation != null){
+				return new InventoryGUI(titleTranslation, placeholderGenerator, messenger, type, type.getDefaultSize(), background, clickables, closeConsumer, openConsumer, regenerateItems);
+			} else {
+				return new InventoryGUI(name, type, type.getDefaultSize(), background, clickables, closeConsumer, openConsumer, regenerateItems, messenger);
+			}
 		}
 	}
 }

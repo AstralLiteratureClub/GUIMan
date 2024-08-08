@@ -10,7 +10,7 @@ import java.util.function.BiFunction;
 @FunctionalInterface
 public interface SignAction {
 	default SignAction openInventory(InventoryGUI gui) {
-		return (player, lines) -> gui.generateInventory(player);
+		return (player, lines) -> gui.open(player);
 	}
 	default SignAction openInventory(Inventory inventory) {
 		return (player, lines) -> player.getScheduler().run(SignGUI.packetHandler.getPlugin(), t->player.openInventory(inventory), null);

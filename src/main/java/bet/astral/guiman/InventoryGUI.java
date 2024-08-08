@@ -1,5 +1,12 @@
 package bet.astral.guiman;
 
+import bet.astral.guiman.background.Background;
+import bet.astral.guiman.clickable.Clickable;
+import bet.astral.guiman.clickable.ClickableLike;
+import bet.astral.guiman.clickable.ClickableProvider;
+import bet.astral.messenger.v2.Messenger;
+import bet.astral.messenger.v2.placeholder.PlaceholderList;
+import bet.astral.messenger.v2.translation.TranslationKey;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -14,135 +21,115 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+/**
+ * GUIMans GUIs are InventoryGUIs.
+ * Provides a GUI which can be edited using {@link InventoryGUIBuilder}.
+ * Allows messenger-based translation GUIs to require only one GUI per server.
+ */
 @Getter
 public class InventoryGUI {
-	private static JavaPlugin plugin;
+	protected static JavaPlugin PLUGIN;
 	public static void init(@NotNull JavaPlugin plugin){
-		InventoryGUI.plugin = plugin;
+		InventoryGUI.PLUGIN = plugin;
 		plugin.getServer().getPluginManager().registerEvents(new InventoryListener(), plugin);
 	}
 	@Getter(AccessLevel.NONE)
-	public static final Consumer<Player> empty_consumer = player -> {};
+	public static final Consumer<Player> EMPTY_CONSUMER = player -> {};
 	private final Map<Player, InteractableGUI> players = new HashMap<>();
 	private final Component name;
 	private final InventoryType type;
 	private final int slots;
-	private final Clickable background;
-	private final Map<Integer, List<Clickable>> clickable;
+	private final Background background;
+	private final Map<Integer, Collection<ClickableLike>> clickables;
 	@Getter(AccessLevel.PUBLIC)
 	private final Map<Integer, Clickable> ids = new HashMap<>();
 	@Getter(AccessLevel.NONE)
-	private final InteractableGUI sharedGUI;
 	private final Consumer<Player> closeConsumer;
 	private final Consumer<Player> openConsumer;
 	private final boolean regenerateItems;
-	@Getter(AccessLevel.NONE)
-	public boolean shared = false;
-	public boolean papi = false;
 
-	public InventoryGUI(@Nullable Component name, @NotNull InventoryType type, @Nullable Clickable background, @NotNull Map<@NotNull Integer, @NotNull List<@NotNull Clickable>> clickable, @Nullable  Consumer<@NotNull Player> closeConsumer, @Nullable Consumer<@NotNull Player> openConsumer, boolean regenerateItems) {
-		this.name = name;
-		this.type = type;
-		this.slots = type.getDefaultSize();
-		this.background = background;
-		this.clickable = clickable;
-		this.closeConsumer = closeConsumer;
-		this.openConsumer = openConsumer;
-		this.regenerateItems = regenerateItems;
-		generateIds();
-		sharedGUI = new InteractableGUI(this);
-	}
-	public InventoryGUI(@Nullable Component name, int rows, @Nullable Clickable background, @NotNull Map<@NotNull Integer, @NotNull List<@NotNull Clickable>> clickable, @Nullable  Consumer<@NotNull Player> closeConsumer, @Nullable Consumer<@NotNull Player> openConsumer, boolean regenerateItems) {
+	@Nullable
+	private final Messenger messenger;
+	@Nullable
+	private final TranslationKey nameTranslation;
+	@Nullable
+	private final Function<Player, PlaceholderList> placeholderGenerator;
+	private final boolean useMessenger;
+
+	public InventoryGUI(@Nullable Component name, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, Messenger messenger) {
 		this.name = name;
 		this.closeConsumer = closeConsumer;
 		this.openConsumer = openConsumer;
 		this.regenerateItems = regenerateItems;
-		this.type = InventoryType.CHEST;
-		this.slots = rows*9;
-		this.background = background;
-		this.clickable = clickable;
-		generateIds();
-		sharedGUI = new InteractableGUI(this);
-	}
-
-	public InventoryGUI(@Nullable Component name, @NotNull InventoryType type, @Nullable Clickable background, @NotNull Map<@NotNull Integer, @NotNull List<@NotNull Clickable>> clickable, boolean regenerateItems) {
-		this.name = name;
 		this.type = type;
-		this.slots = type.getDefaultSize();
+		this.slots = slots;
 		this.background = background;
-		this.clickable = clickable;
-		this.regenerateItems = regenerateItems;
-		this.openConsumer = empty_consumer;
-		this.closeConsumer = empty_consumer;
-		generateIds();
-		sharedGUI = new InteractableGUI(this);
-	}
-	public InventoryGUI(@Nullable Component name, int rows, @Nullable Clickable background, @NotNull Map<@NotNull Integer, @NotNull List<@NotNull Clickable>> clickable, boolean regenerateItems) {
-		this.name = name;
-		this.regenerateItems = regenerateItems;
-		this.openConsumer = empty_consumer;
-		this.closeConsumer = empty_consumer;
-		this.type = InventoryType.CHEST;
-		this.slots = rows*9;
-		this.background = background;
-		this.clickable = clickable;
-		generateIds();
-		sharedGUI = new InteractableGUI(this);
+		this.clickables = clickable;
+		this.messenger = messenger;
+		this.nameTranslation = null;
+		this.placeholderGenerator = null;
+		this.useMessenger = false;
+		ids.put(Clickable.EMPTY.getId(), Clickable.EMPTY);
 	}
 
-	@ApiStatus.NonExtendable
-	private void generateIds(){
-		Map<Integer, Boolean> found = new HashMap<>();
-		for (List<Clickable> clickableList : clickable.values()){
-			for (Clickable item : clickableList){
-				if (item == null){
-					continue;
+	public InventoryGUI(@NotNull TranslationKey nameTranslation, @Nullable Function<Player, PlaceholderList> placeholderGenerator, @NotNull Messenger messenger, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems) {
+		this.name = Component.translatable(nameTranslation);
+		this.nameTranslation = nameTranslation;
+		this.placeholderGenerator = placeholderGenerator;
+		this.messenger = messenger;
+		this.type = type;
+		this.slots = slots;
+		this.background = background;
+		this.clickables = clickable;
+		this.closeConsumer = closeConsumer;
+		this.openConsumer = openConsumer;
+		this.regenerateItems = regenerateItems;
+		this.useMessenger = true;
+		ids.put(Clickable.EMPTY.getId(), Clickable.EMPTY);
+	}
+
+	protected Clickable registerClickable(@NotNull ClickableLike clickableLike, @NotNull Player player) {
+		Clickable clickable = clickableLike instanceof ClickableProvider clickableProvider ? clickableProvider.provide(player) : clickableLike.asClickable();
+		ids.put(clickable.getId(), clickable);
+		return clickable;
+	}
+
+	public void open(Player player) {
+		CompletableFuture.runAsync(()->{
+			try {
+				this.getPlayers().putIfAbsent(player, new InteractableGUI(this, player));
+				InteractableGUI gui = players.get(player);
+				if (gui == null) {
+					gui = new InteractableGUI(this, player);
+					gui.generate(player, messenger);
+				} else if (regenerateItems) {
+					gui.generate(player, messenger);
 				}
-				if (!found.containsKey(item.getId())){
-					found.put(item.getId(), true);
-					ids.put(item.getId(), item);
-				}
+
+				final InteractableGUI interactableGUI = gui;
+				player.getScheduler().run(PLUGIN, t -> player.openInventory(interactableGUI.getInventory()), null);
+			} catch (Exception e){
+				PLUGIN.getSLF4JLogger().error("Error while trying to open GUI to "+ player.getName(), e);
 			}
-		}
-		ids.put(Clickable.empty_air.getId(), Clickable.empty_air);
-	}
-
-	@ApiStatus.NonExtendable
-	public void generateInventory(Player player) {
-		if (shared) {
-			player.getScheduler().run(
-					plugin,
-					t -> {
-						player.openInventory(sharedGUI.getInventory());
-					}, null);
-		} else {
-			player.getScheduler().run(
-					plugin,
-					t -> {
-						this.getPlayers().putIfAbsent(player, new InteractableGUI(this, player));
-						InteractableGUI gui = players.get(player);
-						if (regenerateItems) {
-							gui.generate(player);
-						}
-						player.openInventory(this.getPlayers().get(player).getInventory());
-					}, null);
-		}
+		});
 	}
 
 	public int getId(@Nullable ItemStack itemStack){
 		if (itemStack == null){
-			return Clickable.empty_air.getId();
+			return Clickable.EMPTY.getId();
 		}
 		ItemMeta meta = itemStack.getItemMeta();
 		PersistentDataContainer persistentDataContainer = meta.getPersistentDataContainer();
-		Integer id = persistentDataContainer.get(Clickable.item_key, PersistentDataType.INTEGER);
+		Integer id = persistentDataContainer.get(Clickable.ITEM_KEY, PersistentDataType.INTEGER);
 		if (id == null){
-			return Clickable.empty_air.getId();
+			return Clickable.EMPTY.getId();
 		}
 		return id;
 	}
