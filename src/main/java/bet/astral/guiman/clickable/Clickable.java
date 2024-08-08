@@ -193,9 +193,7 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 					.disablePrefixForNextParse()
 					.parseComponent(new MessageInfoBuilder(itemLore)
 							.addPlaceholders(placeholders).create(), ComponentType.CHAT, receiver);
-			System.out.println("LOREEEEEE");
 			if (component != null){
-				System.out.println("NOT NULLL");
 				meta.lore(ComponentSplit.split(component, "\n"));
 			}
 		}
