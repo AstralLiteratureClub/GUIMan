@@ -1,10 +1,11 @@
 package bet.astral.guiman.clickable;
 
+import bet.astral.guiman.InventoryGUI;
 import bet.astral.guiman.permission.Permission;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.PlaceholderList;
 import bet.astral.messenger.v2.translation.TranslationKey;
-import org.apache.logging.log4j.util.TriConsumer;
+import bet.astral.more4j.function.consumer.TriConsumer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -39,7 +41,9 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 
 	/**
 	 * Creates a new instance of clickable builder. Uses {@link Material#AIR} as the item stack display
+	 * @deprecated use {@link Clickable#builder(Material)}
 	 */
+	@Deprecated(forRemoval = true)
 	public ClickableBuilder() {
 		this.itemStack = ItemStack.of(Material.AIR);
 	}
@@ -53,7 +57,9 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	/**
 	 * Creates a new instance of clickable builder using given material.
 	 * @param material item
+	 * @deprecated use {@link Clickable#builder(Material)}
 	 */
+	@Deprecated(forRemoval = true)
 	public ClickableBuilder(@NotNull Material material) {
 		this.itemStack = new ItemStack(material);
 	}
@@ -61,7 +67,9 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * Creates a new instance of clickable builder using given material.
 	 * Provides item meta-consumer so item meta does not need to be set using {@link ItemStack}
 	 * @param material item
+	 * @deprecated use {@link Clickable#builder(Material, Consumer)}
 	 */
+	@Deprecated(forRemoval = true)
 	public ClickableBuilder(@NotNull Material material, @NotNull Consumer<ItemMeta> itemMeta){
 		itemStack = new ItemStack(material);
 		itemStack.editMeta(itemMeta);
@@ -71,7 +79,9 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * Provides item meta-consumer so item meta does not need to be set using {@link ItemStack}.
 	 * Provides {@link Meta Meta} item meta-consumer
 	 * @param material item
+	 * @deprecated use {@link Clickable#builder(Material, Consumer, Class)}
 	 */
+	@Deprecated(forRemoval = true)
 	public <Meta extends ItemMeta> ClickableBuilder(@NotNull Material material, @NotNull Consumer<Meta> meta, Class<Meta> metaClass){
 		itemStack = new ItemStack(material);
 		itemStack.editMeta(metaClass, meta);
@@ -127,7 +137,9 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * Makes the displayed item to the given item stack
 	 * @param itemStack itemStack
 	 * @return this
+	 * @deprecated Use {@link Clickable#builder(ItemStack)}
 	 */
+	@Deprecated(forRemoval = true)
 	@NotNull
 	public ClickableBuilder item(@NotNull ItemStack itemStack) {
 		this.itemStack = itemStack;
@@ -138,7 +150,9 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * Makes the displayed item to the given item stack
 	 * @param material material
 	 * @return this
+	 * @deprecated Use {@link Clickable#builder(Material)}
 	 */
+	@Deprecated(forRemoval = true)
 	@NotNull
 	public ClickableBuilder item(@NotNull Material material) {
 		this.itemStack = ItemStack.of(material);
@@ -150,7 +164,9 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @param material material
 	 * @param meta item meta
 	 * @return this
+	 * @deprecated Use {@link Clickable#builder(Material, Consumer)}
 	 */
+	@Deprecated(forRemoval = true)
 	@NotNull
 	public ClickableBuilder item(@NotNull Material material, @NotNull Consumer<ItemMeta> meta) {
 		this.itemStack = ItemStack.of(material);
@@ -165,7 +181,9 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @param metaClass meta class type
 	 * @return this
 	 * @param <Meta> Item meta-type
+	 * @deprecated Use {@link Clickable#builder(Material, Consumer, Class)}
 	 */
+	@Deprecated(forRemoval = true)
 	@NotNull
 	public <Meta extends ItemMeta> ClickableBuilder item(@NotNull Material material, @NotNull Consumer<Meta> meta, Class<Meta> metaClass){
 		itemStack = new ItemStack(material);
@@ -179,6 +197,7 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @param meta meta
 	 * @return this
 	 */
+	@Deprecated(forRemoval = true)
 	@NotNull
 	public ClickableBuilder item(@NotNull Material material, @NotNull ItemMeta meta) {
 		this.itemStack = ItemStack.of(material);
@@ -215,6 +234,17 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 */
 	@NotNull
 	public ClickableBuilder permission(@NotNull Predicate<Player> permission){
+		this.permission = Permission.of(permission);
+		return this;
+	}
+
+	/**
+	 * Sets the permission to display this clickable
+	 * @param permission permission
+	 * @return this
+	 */
+	@NotNull
+	public ClickableBuilder permission(@NotNull BiPredicate<InventoryGUI, Player> permission){
 		this.permission = Permission.of(permission);
 		return this;
 	}
@@ -389,11 +419,21 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 		return builder;
 	}
 
+	/**
+	 * Builds the clickable and returns final product
+	 * @return final product
+	 */
 	@Override
 	public Clickable asClickable() {
 		return build();
 	}
 
+	/**
+	 * Builds the clickable and returns a generated item for the clickable
+	 * @param messenger messenger (nullable)
+	 * @param player player
+	 * @return item stack
+	 */
 	@Override
 	public ItemStack generate(Messenger messenger, Player player) {
 		return build().generate(messenger, player);

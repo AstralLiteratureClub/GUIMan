@@ -18,6 +18,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NonBlocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,8 +63,23 @@ public class InventoryGUI {
 	@Nullable
 	private final Function<Player, PlaceholderList> placeholderGenerator;
 	private final boolean useMessenger;
+	private Consumer<Player> generationExceptionPlayerHandler;
 
-	public InventoryGUI(@Nullable Component name, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, Messenger messenger) {
+	/**
+	 * Creates a GUI with static name which is not modified using messenger
+	 * @param name inventory title
+	 * @param type the type of inventory (Can be null)
+	 * @param slots how many slots (or 0 if no chest inventory)
+	 * @param background background
+	 * @param clickable the clickables
+	 * @param closeConsumer consumer ran when closing inventory
+	 * @param openConsumer consumer ran when opening inventory
+ 	 * @param regenerateItems should inventory always regenerate?
+	 * @param messenger messenger
+	 * @param generationExceptionPlayerHandler exception handler when trying to generate inventory for a player
+	 */
+	@ApiStatus.Internal
+	public InventoryGUI(@Nullable Component name, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, Messenger messenger, Consumer<Player> generationExceptionPlayerHandler) {
 		this.name = name;
 		this.closeConsumer = closeConsumer;
 		this.openConsumer = openConsumer;
@@ -73,13 +89,29 @@ public class InventoryGUI {
 		this.background = background;
 		this.clickables = clickable;
 		this.messenger = messenger;
+		this.generationExceptionPlayerHandler = generationExceptionPlayerHandler;
 		this.nameTranslation = null;
 		this.placeholderGenerator = null;
 		this.useMessenger = false;
 		ids.put(Clickable.EMPTY.getId(), Clickable.EMPTY);
 	}
 
-	public InventoryGUI(@NotNull TranslationKey nameTranslation, @Nullable Function<Player, PlaceholderList> placeholderGenerator, @NotNull Messenger messenger, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems) {
+	/**
+	 * Creates a GUI with static name which is not modified using messenger
+	 * @param nameTranslation the translation code for inventory title
+	 * @param placeholderGenerator the placeholder generator ran when creating title
+	 * @param type the type of inventory (Can be null)
+	 * @param slots how many slots (or 0 if no chest inventory)
+	 * @param background background
+	 * @param clickable the clickables
+	 * @param closeConsumer consumer ran when closing inventory
+	 * @param openConsumer consumer ran when opening inventory
+	 * @param regenerateItems should inventory always regenerate?
+	 * @param messenger messenger
+	 * @param generationExceptionPlayerHandler exception handler when trying to generate inventory for a player
+	 */
+	@ApiStatus.Internal
+	public InventoryGUI(@NotNull TranslationKey nameTranslation, @Nullable Function<Player, PlaceholderList> placeholderGenerator, @NotNull Messenger messenger, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, Consumer<Player> generationExceptionPlayerHandler) {
 		this.name = Component.translatable(nameTranslation);
 		this.nameTranslation = nameTranslation;
 		this.placeholderGenerator = placeholderGenerator;
@@ -91,16 +123,30 @@ public class InventoryGUI {
 		this.closeConsumer = closeConsumer;
 		this.openConsumer = openConsumer;
 		this.regenerateItems = regenerateItems;
+		this.generationExceptionPlayerHandler = generationExceptionPlayerHandler;
 		this.useMessenger = true;
 		ids.put(Clickable.EMPTY.getId(), Clickable.EMPTY);
 	}
 
+	/**
+	 * Registers clickable to generated when making player inventories
+	 * @param clickableLike clickable to generate
+	 * @param player player to provide for
+	 * @return given clickable
+	 */
+	@ApiStatus.Internal
 	protected Clickable registerClickable(@NotNull ClickableLike clickableLike, @NotNull Player player) {
 		Clickable clickable = clickableLike instanceof ClickableProvider clickableProvider ? clickableProvider.provide(player) : clickableLike.asClickable();
 		ids.put(clickable.getId(), clickable);
 		return clickable;
 	}
 
+	/**
+	 * Opens the GUI to a player and generates the GUI if none is found.
+	 * Uses asynchronous ways to generate inventories and open inventory in the main bukkit thread after generation
+	 * @param player player to open to
+	 */
+	@NonBlocking
 	public void open(Player player) {
 		CompletableFuture.runAsync(()->{
 			try {
@@ -121,6 +167,11 @@ public class InventoryGUI {
 		});
 	}
 
+	/**
+	 * Returns the id associated with given item stack
+	 * @param itemStack item stack
+	 * @return id, else {@link Clickable#EMPTY}'s id
+	 */
 	public int getId(@Nullable ItemStack itemStack){
 		if (itemStack == null){
 			return Clickable.EMPTY.getId();

@@ -19,7 +19,7 @@ public class StaticBackground extends Background{
 	 * @param clickable clickable
 	 */
 	public StaticBackground(@NotNull Material clickable) {
-		super(new ClickableBuilder(clickable, meta->{
+		super(Clickable.builder(clickable, meta->{
 			if (!clickable.isAir()) {
 				meta.setHideTooltip(true);
 			}

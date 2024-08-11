@@ -3,7 +3,7 @@ package bet.astral.guiman;
 
 import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.permission.Permission;
-import org.apache.logging.log4j.util.TriConsumer;
+import bet.astral.more4j.function.consumer.TriConsumer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,6 +15,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ *
+ */
 public class InventoryListener implements Listener {
 	@EventHandler
 	private void onClick(InventoryClickEvent event){
@@ -37,7 +40,7 @@ public class InventoryListener implements Listener {
 					return;
 				}
 			}
-			if (!hasPermission(player, clickable.getPermission())){
+			if (!hasPermission(player, clickable.getPermission(), gui)){
 				clickable.sendPermissionMessage(player, gui.getMessenger());
 				return;
 			}
@@ -61,14 +64,14 @@ public class InventoryListener implements Listener {
 		}
 	}
 
-	private boolean hasPermission(@Nullable Player player, Permission permission){
+	private boolean hasPermission(@Nullable Player player, Permission permission, InventoryGUI gui){
 		if (permission==null){
 			return true;
 		}
 		if (player == null){
 			return true;
 		}
-		return permission.hasPermission(player);
+		return permission.hasPermission(player, gui);
 	}
 
 }

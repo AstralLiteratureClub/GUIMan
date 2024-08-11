@@ -8,8 +8,8 @@ import bet.astral.guiman.clickable.ClickableLike;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.PlaceholderList;
 import bet.astral.messenger.v2.translation.TranslationKey;
+import bet.astral.more4j.function.consumer.TriConsumer;
 import net.kyori.adventure.text.Component;
-import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class InventoryGUIBuilder {
+	public static boolean throwExceptionIfMessengerNull = true;
 	private Component name;
 	private final InventoryType type;
 	private Background background;
@@ -33,6 +34,8 @@ public class InventoryGUIBuilder {
 	private TranslationKey titleTranslation;
 	private Function<Player, PlaceholderList> placeholderGenerator = (p)->new PlaceholderList();
 	private Messenger messenger;
+	private Consumer<Void> builderExceptionPlayerHandler;
+	private Consumer<Player> generationExceptionPlayerHandler;
 
 	/**
 	 * Creates chest inventory gui builder. Chest inventories is the most supported inventory type of GUIMan
@@ -238,23 +241,54 @@ public class InventoryGUIBuilder {
 		return this;
 	}
 
+	/**
+	 * Accepted when an internal exception has accorded
+	 * while trying to create package {@code THIS} builder to a {@link InventoryGUI}
+	 *
+	 * @param builderExceptionPlayerHandler action executed when an error accords
+	 * @return this
+	 */
+	public InventoryGUIBuilder builderExceptionPlayerHandler(Consumer<Void> builderExceptionPlayerHandler) {
+		this.builderExceptionPlayerHandler = builderExceptionPlayerHandler;
+		return this;
+	}
+
+	/**
+	 * Accepted when an internal exception has accorded
+	 * while trying to generate inventory values in inventory {@link InteractableGUI},
+	 * {@link InteractableGUI#generate(Player, Messenger)}
+	 *
+	 * @param generationExceptionPlayerHandler action executed when an error accords
+	 * @return this
+	 */
+	public InventoryGUIBuilder generationExceptionPlayerHandler(Consumer<Player> generationExceptionPlayerHandler) {
+		this.generationExceptionPlayerHandler = generationExceptionPlayerHandler;
+		return this;
+	}
 
 	public InventoryGUI build(){
-		if (messenger == null){
-			throw new RuntimeException("No messenger foúnd");
-		}
-		if (this.type == InventoryType.CHEST){
-			if (titleTranslation != null){
-				return new InventoryGUI(titleTranslation, placeholderGenerator, messenger, InventoryType.CHEST, rows.getSlots(), background, clickables, closeConsumer, openConsumer, regenerateItems);
-			} else {
-				return new InventoryGUI(name, InventoryType.CHEST, rows.getSlots(), background, clickables, closeConsumer, openConsumer, regenerateItems, messenger);
+		try {
+			if (messenger == null && throwExceptionIfMessengerNull) {
+				throw new RuntimeException("Messenger was null while trying to package builder to InventoryGUI");
 			}
-		} else {
-			if (titleTranslation != null){
-				return new InventoryGUI(titleTranslation, placeholderGenerator, messenger, type, type.getDefaultSize(), background, clickables, closeConsumer, openConsumer, regenerateItems);
+			if (this.type == InventoryType.CHEST) {
+				if (titleTranslation != null) {
+					return new InventoryGUI(titleTranslation, placeholderGenerator, messenger, InventoryType.CHEST, rows.getSlots(), background, clickables, closeConsumer, openConsumer, regenerateItems, generationExceptionPlayerHandler);
+				} else {
+					return new InventoryGUI(name, InventoryType.CHEST, rows.getSlots(), background, clickables, closeConsumer, openConsumer, regenerateItems, messenger, generationExceptionPlayerHandler);
+				}
 			} else {
-				return new InventoryGUI(name, type, type.getDefaultSize(), background, clickables, closeConsumer, openConsumer, regenerateItems, messenger);
+				if (titleTranslation != null) {
+					return new InventoryGUI(titleTranslation, placeholderGenerator, messenger, type, type.getDefaultSize(), background, clickables, closeConsumer, openConsumer, regenerateItems, generationExceptionPlayerHandler);
+				} else {
+					return new InventoryGUI(name, type, type.getDefaultSize(), background, clickables, closeConsumer, openConsumer, regenerateItems, messenger, generationExceptionPlayerHandler);
+				}
 			}
+		} catch (Exception e){
+			if (builderExceptionPlayerHandler != null) {
+				builderExceptionPlayerHandler.accept(null);
+			}
+			throw new RuntimeException(e);
 		}
 	}
 }

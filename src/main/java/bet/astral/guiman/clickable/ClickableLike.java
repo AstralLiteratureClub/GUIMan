@@ -15,5 +15,9 @@ public interface ClickableLike {
 	 */
 	ItemStack generate(Messenger messenger, Player player);
 
-	default Clickable asClickable() { return null; }
+	/**
+	 * Returns the clickable associated with this clickable
+	 * @return clickable
+	 */
+	Clickable asClickable();
 }

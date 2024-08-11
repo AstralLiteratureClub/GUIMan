@@ -17,8 +17,23 @@ public interface ClickableProvider extends ClickableLike {
 	@NotNull
 	Clickable provide(Player player);
 
+	/**
+	 * Generates clickable for player and generates item
+	 * @param messenger messenger
+	 * @param player player
+	 * @return item stack
+	 */
 	@Override
 	default ItemStack generate(Messenger messenger, Player player) {
-		return asClickable().generate(messenger, player);
+		return provide(player).generate(messenger, player);
+	}
+
+	/**
+	 * Returns NULL, use {@link #provide(Player)}
+	 * @return null
+	 */
+	@Override
+	default Clickable asClickable() {
+		return null;
 	}
 }

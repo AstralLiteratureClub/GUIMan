@@ -7,12 +7,12 @@ import bet.astral.messenger.v2.info.MessageInfoBuilder;
 import bet.astral.messenger.v2.placeholder.PlaceholderList;
 import bet.astral.messenger.v2.receiver.Receiver;
 import bet.astral.messenger.v2.translation.TranslationKey;
+import bet.astral.more4j.function.consumer.TriConsumer;
 import de.cubbossa.translations.ComponentSplit;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -40,7 +40,7 @@ import java.util.function.Function;
 public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	public static final NamespacedKey ITEM_KEY = new NamespacedKey("guiman", "guiman_inventory_item");
 	static final Random RANDOM = new Random(System.nanoTime());
-	public static final Clickable EMPTY = new ClickableBuilder(Material.AIR).priority(0).displayIfNoPermissions().build();
+	public static final Clickable EMPTY = Clickable.builder(Material.AIR).priority(0).displayIfNoPermissions().build();
 	static final Component PERMISSION_MESSAGE = Component.text("Sorry, but you do not have permissions to use this", NamedTextColor.RED);
 
 	private final int priority;
@@ -65,6 +65,21 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	@Nullable
 	private final Function<Player, PlaceholderList> placeholderGenerator;
 
+
+	/**
+	 * Creates a new clickable. Not recommended to be used. Use {@link ClickableBuilder}
+	 * @param priority the priority of the clickable. The higher priority, the higher priority is for it to be displayed
+	 * @param itemStack item stack
+	 * @param permission permission to use clickable
+	 * @param displayIfNoPermissions should the item be displayed if no permission
+	 * @param actions actions when clicking
+	 * @param data cached data stored in clickable
+	 * @param isAsync is actions asynchronous?
+	 * @param permissionMessage permission message translation
+	 * @param itemName item name translations
+	 * @param itemLore item lore translation
+	 * @param placeholderGenerator placeholder generator
+	 */
 	public Clickable(int priority, @NotNull ItemStack itemStack, @NotNull Permission permission, boolean displayIfNoPermissions, @NotNull Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions, @Nullable Map<String, Object> data, boolean isAsync, @Nullable TranslationKey permissionMessage, @Nullable TranslationKey itemName, @Nullable TranslationKey itemLore, @Nullable Function<Player, PlaceholderList> placeholderGenerator) {
 		this.priority = priority;
 		this.actions = actions;
@@ -80,54 +95,96 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 		generateIds();
 	}
 
-	public Clickable(int priority, @NotNull ItemStack itemStack, boolean displayIfNoPermissions, @NotNull Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions, @NotNull Map<String, Object> data, boolean isAsync, @Nullable TranslationKey permissionMessage, @Nullable TranslationKey itemName, @Nullable TranslationKey itemLore, @Nullable Function<Player, PlaceholderList> placeholderGenerator) {
-		this.priority = priority;
-		this.actions = actions;
-		this.itemStack = itemStack;
-		this.displayIfNoPermissions = displayIfNoPermissions;
-		this.data = data;
-		this.async = isAsync;
-		this.permissionMessage = permissionMessage;
-		this.itemName = itemName;
-		this.itemLore = itemLore;
-		this.placeholderGenerator = placeholderGenerator;
-		this.permission = Permission.NONE;
-		generateIds();
+	/**
+	 * Creates clickable without any actions
+	 * @param itemStack item stack
+	 * @return clickable
+	 */
+	public static Clickable empty(ItemStack itemStack) {
+		return new ClickableBuilder(itemStack).build();
 	}
 
-	public static Clickable empty(ItemStack itemstack) {
-		return new ClickableBuilder(itemstack).build();
+	/**
+	 * Creates clickable without tooltips and click actions
+	 * @param material material
+	 * @return clickable
+	 */
+	public static Clickable empty(@NotNull Material material) {
+		return Clickable.builder(material, meta->meta.setHideTooltip(true)).build();
 	}
 
-	public static Clickable empty(@NotNull Material border) {
-		return new ClickableBuilder(border, meta->meta.setHideTooltip(true)).build();
-	}
-
+	/**
+	 * Creates clickable with given item stack and makes the general click actions execute given action
+	 * @param itemStack item stack
+	 * @param action action
+	 * @return clickable
+	 */
 	public static Clickable general(ItemStack itemStack, TriConsumer<Clickable, ItemStack, Player> action){
 		return new ClickableBuilder(itemStack).actionGeneral(action).build();
 	}
 
+	/**
+	 * Creates a clickable builder
+	 * @return builder
+	 * @deprecated Use {@link #builder(Material)}
+	 */
 	@NotNull
+	@Deprecated(forRemoval = true)
 	public static ClickableBuilder builder(){
-		return new ClickableBuilder();
+		return builder(Material.AIR);
 	}
+
+	/**
+	 * Creates a clickable builder with given item stack as icon
+	 * @param itemStack item stack
+	 * @return builder
+	 */
 	@NotNull
 	public static ClickableBuilder builder(@NotNull ItemStack itemStack){
 		return new ClickableBuilder(itemStack);
 	}
+
+	/**
+	 * Creates a clickable builder with given material as icon
+	 * @param material material
+	 * @return builder
+	 */
 	@NotNull
 	public static ClickableBuilder builder(@NotNull Material material){
-		return new ClickableBuilder(material);
-	}
-	@NotNull
-	public static ClickableBuilder builder(@NotNull Material material, Consumer<ItemMeta> meta){
-		return new ClickableBuilder(material, meta);
-	}
-	@NotNull
- 	public static <Meta extends ItemMeta> ClickableBuilder builder(@NotNull Material material, @NotNull Consumer<Meta> meta, @NotNull Class<Meta> type){
-		return new ClickableBuilder(material, meta, type);
+		return new ClickableBuilder(new ItemStack(material));
 	}
 
+	/**
+	 * Creates a clickable builder with given item stack as a material
+	 * @param material material
+	 * @param meta meta-consumer, to edit meta when item stack is created
+	 * @return builder
+	 */
+	@NotNull
+	public static ClickableBuilder builder(@NotNull Material material, Consumer<ItemMeta> meta){
+		ItemStack itemStack1 = new ItemStack(material);
+		itemStack1.editMeta(meta);
+		return new ClickableBuilder(itemStack1);
+	}
+
+	/**
+	 * Creates a clickable builder with given item stack as material.
+	 * @param material material
+	 * @param meta meta
+	 * @param type the type of item meta
+	 * @return clickable
+	 * @param <Meta> the type of item meta
+	 */
+	@NotNull
+ 	public static <Meta extends ItemMeta> ClickableBuilder builder(@NotNull Material material, @NotNull Consumer<Meta> meta, @NotNull Class<Meta> type){
+		ItemStack itemStack1 = new ItemStack(material);
+		itemStack1.editMeta(type, meta);
+		return new ClickableBuilder(itemStack1);
+	}
+
+	/**
+	 * Generates an id for this clickable.
+	 */
 	private void generateIds(){
 		if (itemStack.getType()==Material.AIR){
 			return;
@@ -141,9 +198,19 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 		itemStack.setItemMeta(meta);
 	}
 
+	/**
+	 * Sets cached data to the clickable
+	 * @param data data
+	 * @param value value
+	 */
 	public void setData(String data, Object value){
 		this.data.put(data, value);
 	}
+
+	/**
+	 * Overrides all of the cached data and stores given data to cached data
+	 * @param data data
+	 */
 	public void setData(Map<String, Object> data) {
 		this.data.clear();
 		if (data == null){
@@ -151,12 +218,22 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 		}
 		this.data.putAll(data);
 	}
+
+	/**
+	 * Clears all the cached data
+	 */
 	public void clearData(){
 		this.data.clear();
 	}
+
+	/**
+	 * Removes given key's data from cached data
+	 * @param key key
+	 */
 	public void clearData(String key){
 		this.data.remove(key);
 	}
+
 	public Object getData(String data){
 		return this.data.get(data);
 	}
@@ -169,12 +246,10 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	@Override
 	public ItemStack generate(@Nullable Messenger messenger, @NotNull Player player) {
 		if (messenger == null){
-			System.out.println("RETURN Messenger");
 			return itemStack;
 		}
 		Receiver receiver = messenger.convertReceiver(player);
 		if (receiver == null){
-			System.out.println("RETURN Item");
 			return itemStack;
 		}
 
