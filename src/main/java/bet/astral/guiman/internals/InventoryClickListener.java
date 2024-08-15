@@ -1,6 +1,7 @@
 package bet.astral.guiman.internals;
 
 
+import bet.astral.guiman.GUIMan;
 import bet.astral.guiman.gui.InventoryGUI;
 import bet.astral.guiman.clickable.ClickAction;
 import bet.astral.guiman.clickable.ClickContext;
@@ -22,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
  *
  */
 @ApiStatus.Internal
-public class InventoryListener implements Listener {
+public class InventoryClickListener implements Listener {
 	@EventHandler
 	private void onClick(InventoryClickEvent event){
 		if (!(event.getWhoClicked() instanceof Player player)){
@@ -59,7 +60,7 @@ public class InventoryListener implements Listener {
 					try {
 						action.run(context);
 					} catch (Exception e){
-						InventoryGUI.PLUGIN.getSLF4JLogger().error("Error accorded while trying to handle clickable", e);
+						GUIMan.GUIMAN.getPlugin().getSLF4JLogger().error("Error accorded while trying to handle clickable", e);
 					}
 				});
 				return;

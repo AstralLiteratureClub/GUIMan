@@ -1,5 +1,6 @@
 package bet.astral.guiman.gui;
 
+import bet.astral.guiman.GUIMan;
 import bet.astral.guiman.background.Background;
 import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.clickable.ClickableLike;
@@ -7,7 +8,6 @@ import bet.astral.guiman.clickable.ClickableProvider;
 import bet.astral.guiman.gui.builders.InventoryGUIBuilder;
 import bet.astral.guiman.gui.builders.InventoryGUIPatternBuilder;
 import bet.astral.guiman.internals.InteractableGUI;
-import bet.astral.guiman.internals.InventoryListener;
 import bet.astral.guiman.utils.ChestRows;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
@@ -42,10 +42,10 @@ import java.util.function.Function;
  */
 @Getter
 public class InventoryGUI {
-	protected static JavaPlugin PLUGIN;
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
+	@Deprecated(forRemoval = true)
 	public static void init(@NotNull JavaPlugin plugin){
-		InventoryGUI.PLUGIN = plugin;
-		plugin.getServer().getPluginManager().registerEvents(new InventoryListener(), plugin);
+		GUIMan.init(plugin);
 	}
 	@Getter(AccessLevel.NONE)
 	public static final Consumer<Player> EMPTY_CONSUMER = player -> {};
@@ -127,7 +127,7 @@ public class InventoryGUI {
 	 * @param generationExceptionPlayerHandler exception handler when trying to generate inventory for a player
 	 */
 	@ApiStatus.Internal
-	public InventoryGUI(@Nullable Component name, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, Messenger messenger, Consumer<Player> generationExceptionPlayerHandler) {
+	public InventoryGUI(@Nullable Component name, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, @Nullable Messenger messenger, Consumer<Player> generationExceptionPlayerHandler) {
 		this.name = name;
 		this.closeConsumer = closeConsumer;
 		this.openConsumer = openConsumer;
@@ -183,7 +183,7 @@ public class InventoryGUI {
 	 * @return given clickable
 	 */
 	@ApiStatus.Internal
-	protected Clickable registerClickable(@NotNull ClickableLike clickableLike, @NotNull Player player) {
+	public Clickable registerClickable(@NotNull ClickableLike clickableLike, @NotNull Player player) {
 		Clickable clickable = clickableLike instanceof ClickableProvider clickableProvider ? clickableProvider.provide(player) : clickableLike.asClickable();
 		ids.put(clickable.getId(), clickable);
 		return clickable;
@@ -208,9 +208,9 @@ public class InventoryGUI {
 				}
 
 				final InteractableGUI interactableGUI = gui;
-				player.getScheduler().run(PLUGIN, t -> player.openInventory(interactableGUI.getInventory()), null);
+				player.getScheduler().run(GUIMan.GUIMAN.getPlugin(), t -> player.openInventory(interactableGUI.getInventory()), null);
 			} catch (Exception e){
-				PLUGIN.getSLF4JLogger().error("Error while trying to open GUI to "+ player.getName(), e);
+				GUIMan.GUIMAN.getPlugin().getSLF4JLogger().error("Error while trying to open GUI to {}", player.getName(), e);
 			}
 		});
 	}

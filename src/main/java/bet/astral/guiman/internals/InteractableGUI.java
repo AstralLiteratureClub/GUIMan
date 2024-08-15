@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * Interactable GUI which players click on.
- * Uses {@link InventoryGUI} as base and {@link InventoryListener} converts clicks to actions represented by {@link Clickable}
+ * Uses {@link InventoryGUI} as base and {@link InventoryClickListener} converts clicks to actions represented by {@link Clickable}
  */
 @ApiStatus.Internal
 public class InteractableGUI implements InventoryHolder {
