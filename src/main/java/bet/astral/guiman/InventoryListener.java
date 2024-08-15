@@ -1,9 +1,10 @@
 package bet.astral.guiman;
 
 
+import bet.astral.guiman.clickable.ClickAction;
+import bet.astral.guiman.clickable.ClickContext;
 import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.permission.Permission;
-import bet.astral.more4j.function.consumer.TriConsumer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -44,23 +45,23 @@ public class InventoryListener implements Listener {
 				clickable.sendPermissionMessage(player, gui.getMessenger());
 				return;
 			}
-			Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions = clickable.getActions();
-			TriConsumer<Clickable, ItemStack, Player> consumer = clickable.getActions().get(event.getClick());
-			if (consumer == null){
+			Map<ClickType, ClickAction> actions = clickable.getActions();
+			ClickAction action = actions.get(event.getClick());
+			if (action == null){
 				return;
 			}
+			ClickContext context = new ClickContext(gui, event.getInventory(), itemStack, event.getClick(), player, clickable);
 			if (clickable.isAsync()){
-				final Clickable finalClickable = clickable;
 				CompletableFuture.runAsync(()->{
 					try {
-						consumer.accept(finalClickable, itemStack, player);
+						action.run(context);
 					} catch (Exception e){
 						InventoryGUI.PLUGIN.getSLF4JLogger().error("Error accorded while trying to handle clickable", e);
 					}
 				});
 				return;
 			}
-			consumer.accept(clickable, itemStack, player);
+			action.run(context);
 		}
 	}
 

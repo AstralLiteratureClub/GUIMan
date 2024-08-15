@@ -104,10 +104,10 @@ public class InteractableGUI implements InventoryHolder {
 					if (!isBackground && hasPermission(player, clickable.getPermission(), gui)) {
 						inventory.setItem(i, clickable.generate(messenger, player));
 						break;
-					} else if (!isBackground && clickable.isDisplayIfNoPermissions()) {
+					} else if (!isBackground && !hasPermission(player, clickable.getPermission(), gui) && clickable.isDisplayIfNoPermissions()) {
 						inventory.setItem(i, clickable.generate(messenger, player));
 						break;
-					} else {
+					} else if (isBackground){
 						inventory.setItem(i, clickable.generate(messenger, player));
 						break;
 					}

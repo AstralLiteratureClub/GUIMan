@@ -3,18 +3,13 @@ package bet.astral.guiman;
 import bet.astral.guiman.background.Background;
 import bet.astral.guiman.background.builders.BackgroundBuilder;
 import bet.astral.guiman.background.Backgrounds;
-import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.clickable.ClickableLike;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.PlaceholderList;
 import bet.astral.messenger.v2.translation.TranslationKey;
-import bet.astral.more4j.function.consumer.TriConsumer;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -173,20 +168,6 @@ public class InventoryGUIBuilder {
 		}
 		return this;
 	}
-
-	public InventoryGUIBuilder clickableGeneral(int slot, ItemStack itemStack, TriConsumer<Clickable, ItemStack, Player> action){
-		return clickable(slot, Clickable.general(itemStack, action));
-	}
-	public <Meta extends ItemMeta> InventoryGUIBuilder clickableGeneral(int slot, Material material, Consumer<Meta> meta, Class<Meta> metaType, TriConsumer<Clickable, ItemStack, Player> action){
-		return clickable(slot, Clickable.builder(material, meta, metaType).actionGeneral(action));
-	}
-	public InventoryGUIBuilder clickableGeneral(int slot, Material material, Consumer<ItemMeta> meta, TriConsumer<Clickable, ItemStack, Player> action){
-		return clickable(slot, Clickable.builder(material, meta).actionGeneral(action));
-	}
-	public InventoryGUIBuilder clickableGeneral(int slot, Material material, TriConsumer<Clickable, ItemStack, Player> action){
-		return clickable(slot, Clickable.builder(material).actionGeneral(action));
-	}
-
 	public InventoryGUIBuilder addClickable(int slot, @NotNull ClickableLike clickable){
 		return addClickable(slot, List.of(clickable));
 	}

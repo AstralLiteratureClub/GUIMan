@@ -1,7 +1,6 @@
 package bet.astral.guiman.background;
 
 import bet.astral.guiman.clickable.Clickable;
-import bet.astral.guiman.clickable.ClickableBuilder;
 import bet.astral.guiman.clickable.ClickableLike;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +14,7 @@ import java.util.Optional;
 public class StaticBackground extends Background{
 	/**
 	 * Creates a new instance of a static background.
-	 * Creates clickable using {@link Clickable#empty(Material)} and with first param.
+	 * Creates clickable using {@link Clickable#noTooltip(Material)} and with first param.
 	 * @param clickable clickable
 	 */
 	public StaticBackground(@NotNull Material clickable) {

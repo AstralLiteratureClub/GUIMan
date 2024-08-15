@@ -1,7 +1,6 @@
 package bet.astral.guiman.background.builders;
 
 import bet.astral.guiman.clickable.Clickable;
-import bet.astral.guiman.clickable.ClickableBuilder;
 import bet.astral.guiman.background.Background;
 import bet.astral.guiman.clickable.ClickableLike;
 import org.bukkit.Material;
@@ -41,7 +40,7 @@ public class CheckeredPatternBuilder extends BackgroundBuilder {
 			this.first = Clickable.EMPTY;
 			return this;
 		}
-		this.first = Clickable.empty(material);
+		this.first = Clickable.noTooltip(material);
 		return this;
 	}
 
@@ -67,7 +66,7 @@ public class CheckeredPatternBuilder extends BackgroundBuilder {
 			this.second = Clickable.EMPTY;
 			return this;
 		}
-		this.second = Clickable.empty(material);
+		this.second = Clickable.noTooltip(material);
 		return this;
 	}
 

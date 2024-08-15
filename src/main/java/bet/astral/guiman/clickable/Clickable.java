@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +52,7 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	private final Permission permission;
 	private final boolean displayIfNoPermissions;
 	@NotNull
-	private final Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions;
+	private final Map<ClickType, ClickAction> actions;
 	@NotNull
 	private final Map<String, Object> data;
 	private final int id = RANDOM.nextInt();
@@ -64,7 +65,6 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	private final TranslationKey itemLore;
 	@Nullable
 	private final Function<Player, PlaceholderList> placeholderGenerator;
-
 
 	/**
 	 * Creates a new clickable. Not recommended to be used. Use {@link ClickableBuilder}
@@ -80,7 +80,7 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 * @param itemLore item lore translation
 	 * @param placeholderGenerator placeholder generator
 	 */
-	public Clickable(int priority, @NotNull ItemStack itemStack, @NotNull Permission permission, boolean displayIfNoPermissions, @NotNull Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions, @Nullable Map<String, Object> data, boolean isAsync, @Nullable TranslationKey permissionMessage, @Nullable TranslationKey itemName, @Nullable TranslationKey itemLore, @Nullable Function<Player, PlaceholderList> placeholderGenerator) {
+	public Clickable(int priority, @NotNull ItemStack itemStack, @NotNull Permission permission, boolean displayIfNoPermissions, @NotNull Map<ClickType, ClickAction> actions, @Nullable Map<String, Object> data, boolean isAsync, @Nullable TranslationKey permissionMessage, @Nullable TranslationKey itemName, @Nullable TranslationKey itemLore, @Nullable Function<Player, PlaceholderList> placeholderGenerator) {
 		this.priority = priority;
 		this.actions = actions;
 		this.itemStack = itemStack;
@@ -100,8 +100,8 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 * @param itemStack item stack
 	 * @return clickable
 	 */
-	public static Clickable empty(ItemStack itemStack) {
-		return new ClickableBuilder(itemStack).build();
+	public static Clickable noTooltip(ItemStack itemStack) {
+		return new ClickableBuilder(itemStack).hideTooltip().build();
 	}
 
 	/**
@@ -109,8 +109,8 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 * @param material material
 	 * @return clickable
 	 */
-	public static Clickable empty(@NotNull Material material) {
-		return Clickable.builder(material, meta->meta.setHideTooltip(true)).build();
+	public static Clickable noTooltip(@NotNull Material material) {
+		return Clickable.builder(material).hideTooltip().build();
 	}
 
 	/**
@@ -119,7 +119,19 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 * @param action action
 	 * @return clickable
 	 */
+	@Deprecated
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
 	public static Clickable general(ItemStack itemStack, TriConsumer<Clickable, ItemStack, Player> action){
+		return new ClickableBuilder(itemStack).actionGeneral(action).build();
+	}
+	/**
+	 * Creates clickable with given item stack and makes the general click actions execute given action
+	 * @param itemStack item stack
+	 * @param action action
+	 * @return clickable
+	 */
+	@Deprecated
+	public static Clickable general(ItemStack itemStack, ClickAction action){
 		return new ClickableBuilder(itemStack).actionGeneral(action).build();
 	}
 

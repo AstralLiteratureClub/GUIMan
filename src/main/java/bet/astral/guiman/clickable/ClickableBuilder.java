@@ -9,8 +9,10 @@ import bet.astral.more4j.function.consumer.TriConsumer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +33,7 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	private @NotNull ItemStack itemStack;
 	private Permission permission = Permission.NONE;
 	private boolean displayIfNoPermissions = false;
-	private Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions = new HashMap<>();
+	private Map<ClickType, ClickAction> actions = new HashMap<>();
 	private Map<String, Object> data;
 	private boolean async = true;
 	private TranslationKey permissionMessage = null;
@@ -85,6 +87,26 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	public <Meta extends ItemMeta> ClickableBuilder(@NotNull Material material, @NotNull Consumer<Meta> meta, Class<Meta> metaClass){
 		itemStack = new ItemStack(material);
 		itemStack.editMeta(metaClass, meta);
+	}
+
+	/**
+	 * Edits item meta of item stack and adds all item flags
+	 * @return this
+	 */
+	@NotNull
+	public ClickableBuilder hideItemFlags(){
+		itemStack.editMeta(meta->meta.addItemFlags(ItemFlag.values()));
+		return this;
+	}
+
+	/**
+	 * Edits item meta of item stack and makes tooltip hidden
+	 * @return this
+	 */
+	@NotNull
+	public ClickableBuilder hideTooltip(){
+		itemStack.editMeta(meta->meta.setHideTooltip(true));
+		return this;
 	}
 
 	/**
@@ -265,8 +287,26 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @return this
 	 */
 	@NotNull
+	@Deprecated(forRemoval = true)
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
 	public ClickableBuilder action(Map<ClickType, TriConsumer<Clickable, ItemStack, Player>> actions){
-		this.actions = new HashMap<>(actions);
+		Map<ClickType, ClickAction> converted = new HashMap<>();
+		actions.forEach((type, clickableItemStackPlayerTriConsumer) -> {
+			ClickAction clickAction = clickContext -> clickableItemStackPlayerTriConsumer.accept(clickContext.getClickable(), clickContext.getItemStack(), clickContext.getWho());
+			converted.put(type, clickAction);
+		});
+		this.actions = converted;
+		return this;
+	}
+
+	/**
+	 * Overrides the actions for this clickable
+	 * @param actions actions
+	 * @return this
+	 */
+	@NotNull
+	public ClickableBuilder actions(Map<ClickType, ClickAction> actions){
+		this.actions = actions;
 		return this;
 	}
 
@@ -277,7 +317,20 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @return this
 	 */
 	@NotNull
+	@Deprecated(forRemoval = true)
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
 	public ClickableBuilder action(@NotNull ClickType type, @NotNull TriConsumer<Clickable, ItemStack, Player> action){
+		this.actions.put(type, (clickContext -> action.accept(clickContext.getClickable(), clickContext.getItemStack(), clickContext.getWho())));
+		return this;
+	}
+	/**
+	 * Sets the click action for given click type using given action consumer
+	 * @param type type
+	 * @param action action
+	 * @return this
+	 */
+	@NotNull
+	public ClickableBuilder action(@NotNull ClickType type, @NotNull ClickAction action){
 		this.actions.put(type, action);
 		return this;
 	}
@@ -289,9 +342,11 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @return this
 	 */
 	@NotNull
+	@Deprecated(forRemoval = true)
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
 	public ClickableBuilder action(@NotNull ClickType[] types, @NotNull TriConsumer<Clickable, ItemStack, Player> action){
 		for (ClickType clickType : types){
-			this.actions.put(clickType, action);
+			action(clickType, action);
 		}
 		return this;
 	}
@@ -303,7 +358,34 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @return this
 	 */
 	@NotNull
-	public ClickableBuilder action(@NotNull Collection<ClickType> types, @NotNull TriConsumer<Clickable, ItemStack, Player> action){
+	public ClickableBuilder action(@NotNull ClickType[] types, @NotNull ClickAction action){
+		for (ClickType clickType : types){
+			this.actions.put(clickType, action);
+		}
+		return this;
+	}
+	/**
+	 * Sets the click action for given click type using given action consumer
+	 * @param types click types
+	 * @param action action
+	 * @return this
+	 */
+	@NotNull
+	@Deprecated(forRemoval = true)
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")	public ClickableBuilder action(@NotNull Collection<ClickType> types, @NotNull TriConsumer<Clickable, ItemStack, Player> action){
+		for (ClickType clickType : types){
+			action(clickType, action);
+		}
+		return this;
+	}
+	/**
+	 * Sets the click action for given click type using given action consumer
+	 * @param types click types
+	 * @param action action
+	 * @return this
+	 */
+	@NotNull
+	public ClickableBuilder action(@NotNull Collection<ClickType> types, @NotNull ClickAction action){
 		for (ClickType clickType : types){
 			this.actions.put(clickType, action);
 		}
@@ -316,7 +398,19 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @return this
 	 */
 	@NotNull
+	@Deprecated(forRemoval = true)
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
 	public ClickableBuilder actionAll(@NotNull TriConsumer<Clickable, ItemStack, Player> action){
+		return action(ClickType.values(), action);
+	}
+
+	/**
+	 * Sets the action for all click types to given action
+	 * @param action action
+	 * @return this
+	 */
+	@NotNull
+	public ClickableBuilder actionAll(@NotNull ClickAction action){
 		return action(ClickType.values(), action);
 	}
 
@@ -325,6 +419,7 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @param action action
 	 * @return this
 	 */
+	@NotNull
 	public ClickableBuilder actionGeneral(@NotNull TriConsumer<Clickable, ItemStack, Player> action){
 		action(ClickType.SHIFT_LEFT, action);
 		action(ClickType.SHIFT_RIGHT, action);
@@ -332,7 +427,19 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 		action(ClickType.RIGHT, action);
 		return this;
 	}
-
+	/**
+	 * Sets the general click types to have given action
+	 * @param action action
+	 * @return this
+	 */
+	@NotNull
+	public ClickableBuilder actionGeneral(@NotNull ClickAction action){
+		action(ClickType.SHIFT_LEFT, action);
+		action(ClickType.SHIFT_RIGHT, action);
+		action(ClickType.LEFT, action);
+		action(ClickType.RIGHT, action);
+		return this;
+	}
 	/**
 	 * Makes all actions executed using this clickable in ASynchronous thread.
 	 * @return this
@@ -406,6 +513,7 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * Clones the clickable builder to a new instance
 	 * @return new instance
 	 */
+	@SuppressWarnings("MethodDoesntCallSuperMethod")
 	@Override
 	public ClickableBuilder clone(){
 		ClickableBuilder builder = new ClickableBuilder(itemStack);

@@ -44,7 +44,7 @@ public class PatternBackgroundBuilder extends BackgroundBuilder {
 			this.clickables.put(character, Clickable.EMPTY);
 			return this;
 		}
-		this.clickables.put(character, Clickable.empty(material));
+		this.clickables.put(character, Clickable.noTooltip(material));
 		return this;
 	}
 
@@ -116,7 +116,7 @@ public class PatternBackgroundBuilder extends BackgroundBuilder {
 		if (material == Material.AIR){
 			empty = Clickable.EMPTY;
 		} else {
-			this.empty = Clickable.empty(material);
+			this.empty = Clickable.noTooltip(material);
 		}
 		return this;
 	}

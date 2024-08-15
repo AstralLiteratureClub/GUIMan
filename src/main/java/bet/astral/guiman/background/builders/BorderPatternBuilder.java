@@ -48,7 +48,7 @@ public class BorderPatternBuilder extends BackgroundBuilder{
 			this.border = Clickable.EMPTY;
 			return this;
 		}
-		this.border = Clickable.empty(border);
+		this.border = Clickable.noTooltip(border);
 		return this;
 	}
 
@@ -76,7 +76,7 @@ public class BorderPatternBuilder extends BackgroundBuilder{
 			this.borderSecond = Clickable.EMPTY;
 			return this;
 		}
-		this.borderSecond = Clickable.empty(border);
+		this.borderSecond = Clickable.noTooltip(border);
 		return this;
 	}
 
@@ -105,7 +105,7 @@ public class BorderPatternBuilder extends BackgroundBuilder{
 			this.other = Clickable.EMPTY;
 			return this;
 		}
-		this.other = Clickable.empty(other);
+		this.other = Clickable.noTooltip(other);
 		return this;
 	}
 
