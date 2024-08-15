@@ -5,7 +5,8 @@ import bet.astral.guiman.background.builders.BackgroundBuilder;
 import bet.astral.guiman.background.Backgrounds;
 import bet.astral.guiman.clickable.ClickableLike;
 import bet.astral.messenger.v2.Messenger;
-import bet.astral.messenger.v2.placeholder.PlaceholderList;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -27,7 +28,7 @@ public class InventoryGUIBuilder {
 	private boolean regenerateItems = false;
 	private final ChestRows rows;
 	private TranslationKey titleTranslation;
-	private Function<Player, PlaceholderList> placeholderGenerator = (p)->new PlaceholderList();
+	private Function<Player, PlaceholderCollection> placeholderGenerator = (p)->new PlaceholderList();
 	private Messenger messenger;
 	private Consumer<Void> builderExceptionPlayerHandler;
 	private Consumer<Player> generationExceptionPlayerHandler;
@@ -95,7 +96,7 @@ public class InventoryGUIBuilder {
 		return this;
 	}
 
-	public InventoryGUIBuilder placeholderGenerator(@NotNull Function<Player, PlaceholderList> generator){
+	public InventoryGUIBuilder placeholderGenerator(@NotNull Function<Player, PlaceholderCollection> generator){
 		this.placeholderGenerator = generator;
 		return this;
 	}

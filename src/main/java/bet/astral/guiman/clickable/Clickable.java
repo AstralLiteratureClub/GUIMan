@@ -4,7 +4,8 @@ import bet.astral.guiman.permission.Permission;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.component.ComponentType;
 import bet.astral.messenger.v2.info.MessageInfoBuilder;
-import bet.astral.messenger.v2.placeholder.PlaceholderList;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.receiver.Receiver;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import bet.astral.more4j.function.consumer.TriConsumer;
@@ -63,8 +64,8 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	private final TranslationKey itemName;
 	@Nullable
 	private final TranslationKey itemLore;
-	@Nullable
-	private final Function<Player, PlaceholderList> placeholderGenerator;
+	@NotNull
+	private final Function<Player, PlaceholderCollection> placeholderGenerator;
 
 	/**
 	 * Creates a new clickable. Not recommended to be used. Use {@link ClickableBuilder}
@@ -80,7 +81,7 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 * @param itemLore item lore translation
 	 * @param placeholderGenerator placeholder generator
 	 */
-	public Clickable(int priority, @NotNull ItemStack itemStack, @NotNull Permission permission, boolean displayIfNoPermissions, @NotNull Map<ClickType, ClickAction> actions, @Nullable Map<String, Object> data, boolean isAsync, @Nullable TranslationKey permissionMessage, @Nullable TranslationKey itemName, @Nullable TranslationKey itemLore, @Nullable Function<Player, PlaceholderList> placeholderGenerator) {
+	public Clickable(int priority, @NotNull ItemStack itemStack, @NotNull Permission permission, boolean displayIfNoPermissions, @NotNull Map<ClickType, ClickAction> actions, @Nullable Map<String, Object> data, boolean isAsync, @Nullable TranslationKey permissionMessage, @Nullable TranslationKey itemName, @Nullable TranslationKey itemLore, @Nullable Function<Player, PlaceholderCollection> placeholderGenerator) {
 		this.priority = priority;
 		this.actions = actions;
 		this.itemStack = itemStack;
@@ -91,7 +92,7 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 		this.permissionMessage = permissionMessage;
 		this.itemName = itemName;
 		this.itemLore = itemLore;
-		this.placeholderGenerator = placeholderGenerator;
+		this.placeholderGenerator = placeholderGenerator != null ? placeholderGenerator : p->new PlaceholderList();
 		generateIds();
 	}
 
@@ -266,7 +267,7 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 		}
 
 		ItemMeta meta = itemStack.getItemMeta();
-		PlaceholderList placeholders = getPlaceholderGenerator() != null ? getPlaceholderGenerator().apply(player) : null;
+		PlaceholderCollection placeholders = getPlaceholderGenerator().apply(player);
 		if (placeholders==null){
 			placeholders = new PlaceholderList();
 		}
@@ -274,12 +275,12 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 		if (itemName != null){
 			meta.displayName(messenger
 					.disablePrefixForNextParse()
-					.parseComponent(new MessageInfoBuilder(itemName).addPlaceholders(placeholders).create(), ComponentType.CHAT, receiver));
+					.parseComponent(new MessageInfoBuilder(itemName).withPlaceholders(placeholders).create(), ComponentType.CHAT, receiver));
 		} else if (itemLore != null){
 			Component component = messenger
 					.disablePrefixForNextParse()
 					.parseComponent(new MessageInfoBuilder(itemLore)
-							.addPlaceholders(placeholders).create(), ComponentType.CHAT, receiver);
+							.withPlaceholders(placeholders).create(), ComponentType.CHAT, receiver);
 			if (component != null){
 				meta.lore(ComponentSplit.split(component, "\n"));
 			}

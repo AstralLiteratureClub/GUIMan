@@ -3,7 +3,8 @@ package bet.astral.guiman.clickable;
 import bet.astral.guiman.InventoryGUI;
 import bet.astral.guiman.permission.Permission;
 import bet.astral.messenger.v2.Messenger;
-import bet.astral.messenger.v2.placeholder.PlaceholderList;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import bet.astral.more4j.function.consumer.TriConsumer;
 import org.bukkit.Material;
@@ -39,7 +40,7 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	private TranslationKey permissionMessage = null;
 	private TranslationKey itemName = null;
 	private TranslationKey itemLore = null;
-	private Function<Player, PlaceholderList> placeholderGenerator = (p)->new PlaceholderList();
+	private Function<Player, PlaceholderCollection> placeholderGenerator = (p)->new PlaceholderList();
 
 	/**
 	 * Creates a new instance of clickable builder. Uses {@link Material#AIR} as the item stack display
@@ -463,7 +464,7 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @param placeholderGenerator placeholder generator
 	 * @return this
 	 */
-	public ClickableBuilder placeholderGenerator(@NotNull Function<Player, PlaceholderList> placeholderGenerator) {
+	public ClickableBuilder placeholderGenerator(@NotNull Function<Player, PlaceholderCollection> placeholderGenerator) {
 		this.placeholderGenerator = placeholderGenerator;
 		return this;
 	}

@@ -5,7 +5,8 @@ import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.clickable.ClickableLike;
 import bet.astral.guiman.clickable.ClickableProvider;
 import bet.astral.messenger.v2.Messenger;
-import bet.astral.messenger.v2.placeholder.PlaceholderList;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -60,10 +61,10 @@ public class InventoryGUI {
 	private final Messenger messenger;
 	@Nullable
 	private final TranslationKey nameTranslation;
-	@Nullable
-	private final Function<Player, PlaceholderList> placeholderGenerator;
+	@NotNull
+	private final Function<Player, PlaceholderCollection> placeholderGenerator;
 	private final boolean useMessenger;
-	private Consumer<Player> generationExceptionPlayerHandler;
+	private final Consumer<Player> generationExceptionPlayerHandler;
 
 	/**
 	 * Creates a GUI with static name which is not modified using messenger
@@ -91,7 +92,7 @@ public class InventoryGUI {
 		this.messenger = messenger;
 		this.generationExceptionPlayerHandler = generationExceptionPlayerHandler;
 		this.nameTranslation = null;
-		this.placeholderGenerator = null;
+		this.placeholderGenerator = p->new PlaceholderList();
 		this.useMessenger = false;
 		ids.put(Clickable.EMPTY.getId(), Clickable.EMPTY);
 	}
@@ -111,10 +112,10 @@ public class InventoryGUI {
 	 * @param generationExceptionPlayerHandler exception handler when trying to generate inventory for a player
 	 */
 	@ApiStatus.Internal
-	public InventoryGUI(@NotNull TranslationKey nameTranslation, @Nullable Function<Player, PlaceholderList> placeholderGenerator, @NotNull Messenger messenger, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, Consumer<Player> generationExceptionPlayerHandler) {
+	public InventoryGUI(@NotNull TranslationKey nameTranslation, @Nullable Function<Player, PlaceholderCollection> placeholderGenerator, @NotNull Messenger messenger, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, Consumer<Player> generationExceptionPlayerHandler) {
 		this.name = Component.translatable(nameTranslation);
 		this.nameTranslation = nameTranslation;
-		this.placeholderGenerator = placeholderGenerator;
+		this.placeholderGenerator = placeholderGenerator != null ? placeholderGenerator : p -> new PlaceholderList();
 		this.messenger = messenger;
 		this.type = type;
 		this.slots = slots;

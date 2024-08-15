@@ -42,7 +42,7 @@ public class InteractableGUI implements InventoryHolder {
 			} else {
 				inventory = Bukkit.createInventory(this, gui.getSlots(), gui.getNameTranslation() != null ?
 						gui.getMessenger().parseComponent(new MessageInfoBuilder(gui.getNameTranslation())
-								.addPlaceholders(gui.getPlaceholderGenerator().apply(player)).create(), ComponentType.CHAT, gui.getMessenger().convertReceiver(player)) : gui.getName());
+								.withPlaceholders(gui.getPlaceholderGenerator().apply(player)).create(), ComponentType.CHAT, gui.getMessenger().convertReceiver(player)) : gui.getName());
 			}
 		} else {
 			if (gui.getName() == null) {
@@ -50,7 +50,7 @@ public class InteractableGUI implements InventoryHolder {
 			} else {
 				inventory = Bukkit.createInventory(this, gui.getType(), gui.getNameTranslation() != null ?
 						gui.getMessenger().parseComponent(new MessageInfoBuilder(gui.getNameTranslation())
-								.addPlaceholders(gui.getPlaceholderGenerator().apply(player)).create(), ComponentType.CHAT, gui.getMessenger().convertReceiver(player)) : gui.getName());
+								.withPlaceholders(gui.getPlaceholderGenerator().apply(player)).create(), ComponentType.CHAT, gui.getMessenger().convertReceiver(player)) : gui.getName());
 			}
 		}
 		generate(player, gui.getMessenger());
