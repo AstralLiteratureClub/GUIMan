@@ -1,6 +1,6 @@
 package bet.astral.guiman.clickable;
 
-import bet.astral.guiman.InventoryGUI;
+import bet.astral.guiman.gui.InventoryGUI;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;

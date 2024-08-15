@@ -1,5 +1,6 @@
-package bet.astral.guiman;
+package bet.astral.guiman.internals;
 
+import bet.astral.guiman.gui.InventoryGUI;
 import bet.astral.guiman.background.Background;
 import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.clickable.ClickableLike;
@@ -34,6 +35,7 @@ public class InteractableGUI implements InventoryHolder {
 	 * @param gui inventory base
 	 * @param player player to open to
 	 */
+	@ApiStatus.Internal
 	public InteractableGUI(@NotNull InventoryGUI gui, @NotNull Player player) {
 		this.gui = gui;
 		if (gui.getType() == InventoryType.CHEST) {

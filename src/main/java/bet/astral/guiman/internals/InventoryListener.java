@@ -1,6 +1,7 @@
-package bet.astral.guiman;
+package bet.astral.guiman.internals;
 
 
+import bet.astral.guiman.gui.InventoryGUI;
 import bet.astral.guiman.clickable.ClickAction;
 import bet.astral.guiman.clickable.ClickContext;
 import bet.astral.guiman.clickable.Clickable;
@@ -11,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -19,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  *
  */
+@ApiStatus.Internal
 public class InventoryListener implements Listener {
 	@EventHandler
 	private void onClick(InventoryClickEvent event){

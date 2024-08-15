@@ -1,6 +1,6 @@
 package bet.astral.signman;
 
-import bet.astral.guiman.InventoryGUI;
+import bet.astral.guiman.gui.InventoryGUI;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 

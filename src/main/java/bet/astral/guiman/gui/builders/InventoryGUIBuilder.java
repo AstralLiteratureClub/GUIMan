@@ -1,9 +1,12 @@
-package bet.astral.guiman;
+package bet.astral.guiman.gui.builders;
 
+import bet.astral.guiman.gui.InventoryGUI;
+import bet.astral.guiman.utils.ChestRows;
 import bet.astral.guiman.background.Background;
 import bet.astral.guiman.background.builders.BackgroundBuilder;
 import bet.astral.guiman.background.Backgrounds;
 import bet.astral.guiman.clickable.ClickableLike;
+import bet.astral.guiman.internals.InteractableGUI;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
@@ -17,35 +20,61 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class InventoryGUIBuilder {
+public class InventoryGUIBuilder implements Cloneable {
 	public static boolean throwExceptionIfMessengerNull = true;
-	private Component name;
 	private final InventoryType type;
+	private final ChestRows rows;
+	private Messenger messenger;
+	private Component name;
+	private TranslationKey titleTranslation;
 	private Background background;
+	private boolean regenerateItems = false;
 	private final Map<@NotNull Integer, @NotNull Collection<@NotNull ClickableLike>> clickables = new HashMap<>();
+	private Function<Player, PlaceholderCollection> placeholderGenerator = (p)->new PlaceholderList();
 	private Consumer<@NotNull Player> closeConsumer;
 	private Consumer<@NotNull Player> openConsumer;
-	private boolean regenerateItems = false;
-	private final ChestRows rows;
-	private TranslationKey titleTranslation;
-	private Function<Player, PlaceholderCollection> placeholderGenerator = (p)->new PlaceholderList();
-	private Messenger messenger;
 	private Consumer<Void> builderExceptionPlayerHandler;
 	private Consumer<Player> generationExceptionPlayerHandler;
+
+	@ApiStatus.Internal
+	protected InventoryGUIBuilder(InventoryGUIBuilder builder){
+		this.name = builder.name;
+		this.type = builder.type;
+		this.background = builder.background;
+		this.clickables.putAll(builder.clickables);
+		this.closeConsumer = builder.closeConsumer;
+		this.openConsumer = builder.openConsumer;
+		this.regenerateItems = builder.regenerateItems;
+		this.rows = builder.rows;
+		this.titleTranslation = builder.titleTranslation;
+		this.placeholderGenerator = builder.placeholderGenerator;
+		this.messenger = builder.messenger;
+		this.builderExceptionPlayerHandler = builder.builderExceptionPlayerHandler;
+		this.generationExceptionPlayerHandler = builder.generationExceptionPlayerHandler;
+	}
 
 	/**
 	 * Creates chest inventory gui builder. Chest inventories is the most supported inventory type of GUIMan
 	 * @param rows how many rows
 	 */
+	@Deprecated(forRemoval = true)
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
 	public InventoryGUIBuilder(@Range(from = 1, to = 6) int rows){
-		this.type = InventoryType.CHEST;
-		this.rows = ChestRows.rows(rows);
+		this(ChestRows.rows(rows), InventoryType.CHEST);
 	}
+
 	/**
 	 * Creates chest inventory gui builder. Chest inventories is the most supported inventory type of GUIMan
-	 * @param rows how many rows
+	 *
+	 * @param rows          how many rows
+	 * @param inventoryType inventory type
 	 */
-	public InventoryGUIBuilder(ChestRows rows){
+	public InventoryGUIBuilder(@NotNull ChestRows rows, @NotNull InventoryType inventoryType){
+		switch (inventoryType){
+			case PLAYER, JUKEBOX, CHISELED_BOOKSHELF, CREATIVE, MERCHANT, DECORATED_POT, COMPOSTER ->{
+				throw new IllegalArgumentException("Cannot use inventory type "+ inventoryType.name()+" as inventory type!");
+			}
+		}
 		this.type = InventoryType.CHEST;
 		this.rows = rows;
 	}
@@ -54,22 +83,19 @@ public class InventoryGUIBuilder {
 	 * Creates a custom inventory gui specified using {@link InventoryType type}
 	 * @param type inventoryType
 	 */
+	@Deprecated(forRemoval = true)
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
 	public InventoryGUIBuilder(InventoryType type) throws IllegalArgumentException{
-		switch (type){
-			case PLAYER, JUKEBOX, CHISELED_BOOKSHELF, CREATIVE, MERCHANT, DECORATED_POT, COMPOSTER ->{
-				throw new IllegalArgumentException("Cannot use inventory type "+ type.name()+" as inventory type!");
-			}
-		}
-		this.type = type;
-		this.rows = null;
+		this(ChestRows.ONE, type);
 	}
 
 	/**
 	 * Sets the title of the inventory to given component
 	 * @param name title of inventory
 	 * @return this
+	 * @deprecated deprecated in favor of messenger-based methods {@link #title(TranslationKey)}
 	 */
-	@ApiStatus.Obsolete
+	@Deprecated()
 	public InventoryGUIBuilder title(@Nullable Component name) {
 		this.name = name;
 		return this;
@@ -248,6 +274,14 @@ public class InventoryGUIBuilder {
 		return this;
 	}
 
+	/**
+	 * Converts this builder to an inventory pattern builder
+	 * @return builder
+	 */
+	public InventoryGUIPatternBuilder patternBuilder(){
+		return new InventoryGUIPatternBuilder(this);
+	}
+
 	public InventoryGUI build(){
 		try {
 			if (messenger == null && throwExceptionIfMessengerNull) {
@@ -272,5 +306,13 @@ public class InventoryGUIBuilder {
 			}
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public InventoryGUIBuilder clone() {
+		return new InventoryGUIBuilder(this);
 	}
 }

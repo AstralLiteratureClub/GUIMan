@@ -1,6 +1,6 @@
 package bet.astral.guiman.permission;
 
-import bet.astral.guiman.InventoryGUI;
+import bet.astral.guiman.gui.InventoryGUI;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

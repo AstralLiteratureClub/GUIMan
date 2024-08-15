@@ -1,9 +1,14 @@
-package bet.astral.guiman;
+package bet.astral.guiman.gui;
 
 import bet.astral.guiman.background.Background;
 import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.clickable.ClickableLike;
 import bet.astral.guiman.clickable.ClickableProvider;
+import bet.astral.guiman.gui.builders.InventoryGUIBuilder;
+import bet.astral.guiman.gui.builders.InventoryGUIPatternBuilder;
+import bet.astral.guiman.internals.InteractableGUI;
+import bet.astral.guiman.internals.InventoryListener;
+import bet.astral.guiman.utils.ChestRows;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
@@ -65,6 +70,48 @@ public class InventoryGUI {
 	private final Function<Player, PlaceholderCollection> placeholderGenerator;
 	private final boolean useMessenger;
 	private final Consumer<Player> generationExceptionPlayerHandler;
+
+	/**
+	 * Creates a new inventory gui builder instance, with inventory type being {@link InventoryType#CHEST}
+	 * @param rows rows to display
+	 * @return new builder
+	 */
+	@NotNull
+	public InventoryGUIBuilder builder(@NotNull ChestRows rows) {
+		return new InventoryGUIBuilder(rows, InventoryType.CHEST);
+	}
+	/**
+	 * Creates a new inventory gui builder instance, with inventory type being {@link InventoryType#CHEST}
+	 * @param rows rows to display
+	 * @return new builder
+	 */
+	@NotNull
+	public InventoryGUIBuilder builder(int rows) {
+		return new InventoryGUIBuilder(ChestRows.rows(rows), InventoryType.CHEST);
+	}
+	@NotNull
+	public InventoryGUIBuilder builder(@NotNull InventoryType inventoryType){
+		return new InventoryGUIBuilder(inventoryType == InventoryType.CHEST ? ChestRows.THREE : ChestRows.ONE, inventoryType);
+	}
+	/**
+	 * Creates a new inventory gui {@link InventoryGUIPatternBuilder} builder instance, with inventory type being {@link InventoryType#CHEST}.
+	 * @param rows rows to display
+	 * @return new builder
+	 */
+	@NotNull
+	public InventoryGUIPatternBuilder patternBuilder(int rows) {
+		return new InventoryGUIBuilder(ChestRows.rows(rows), InventoryType.CHEST).patternBuilder();
+	}
+
+	/**
+	 * Creates a new inventory gui {@link InventoryGUIPatternBuilder} builder instance, with the inventory type being given inventory type.
+	 * @param inventoryType inventory type
+	 * @return new builder
+	 */
+	@NotNull
+	public InventoryGUIPatternBuilder patternBuilder(@NotNull InventoryType inventoryType){
+		return new InventoryGUIBuilder(inventoryType == InventoryType.CHEST ? ChestRows.THREE : ChestRows.ONE, inventoryType).patternBuilder();
+	}
 
 	/**
 	 * Creates a GUI with static name which is not modified using messenger

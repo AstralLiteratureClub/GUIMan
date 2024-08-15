@@ -1,4 +1,4 @@
-package bet.astral.guiman;
+package bet.astral.guiman.utils;
 
 import org.jetbrains.annotations.Range;
 

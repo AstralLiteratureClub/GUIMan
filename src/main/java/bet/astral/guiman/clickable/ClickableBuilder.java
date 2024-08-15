@@ -1,6 +1,6 @@
 package bet.astral.guiman.clickable;
 
-import bet.astral.guiman.InventoryGUI;
+import bet.astral.guiman.gui.InventoryGUI;
 import bet.astral.guiman.permission.Permission;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;

@@ -1,6 +1,6 @@
 package bet.astral.guiman.background.builders;
 
-import bet.astral.guiman.ChestRows;
+import bet.astral.guiman.utils.ChestRows;
 import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.background.Background;
 import bet.astral.guiman.clickable.ClickableLike;
