@@ -131,7 +131,6 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 * @param action action
 	 * @return clickable
 	 */
-	@Deprecated
 	public static Clickable general(ItemStack itemStack, ClickAction action){
 		return new ClickableBuilder(itemStack).actionGeneral(action).build();
 	}
@@ -143,6 +142,7 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 */
 	@NotNull
 	@Deprecated(forRemoval = true)
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
 	public static ClickableBuilder builder(){
 		return builder(Material.AIR);
 	}
