@@ -77,7 +77,7 @@ public class InventoryGUI {
 	 * @return new builder
 	 */
 	@NotNull
-	public InventoryGUIBuilder builder(@NotNull ChestRows rows) {
+	public static InventoryGUIBuilder builder(@NotNull ChestRows rows) {
 		return new InventoryGUIBuilder(rows, InventoryType.CHEST);
 	}
 	/**
@@ -86,11 +86,11 @@ public class InventoryGUI {
 	 * @return new builder
 	 */
 	@NotNull
-	public InventoryGUIBuilder builder(int rows) {
+	public static InventoryGUIBuilder builder(int rows) {
 		return new InventoryGUIBuilder(ChestRows.rows(rows), InventoryType.CHEST);
 	}
 	@NotNull
-	public InventoryGUIBuilder builder(@NotNull InventoryType inventoryType){
+	public static InventoryGUIBuilder builder(@NotNull InventoryType inventoryType){
 		return new InventoryGUIBuilder(inventoryType == InventoryType.CHEST ? ChestRows.THREE : ChestRows.ONE, inventoryType);
 	}
 	/**
@@ -99,7 +99,7 @@ public class InventoryGUI {
 	 * @return new builder
 	 */
 	@NotNull
-	public InventoryGUIPatternBuilder patternBuilder(int rows) {
+	public static InventoryGUIPatternBuilder patternBuilder(int rows) {
 		return new InventoryGUIBuilder(ChestRows.rows(rows), InventoryType.CHEST).patternBuilder();
 	}
 
@@ -109,7 +109,7 @@ public class InventoryGUI {
 	 * @return new builder
 	 */
 	@NotNull
-	public InventoryGUIPatternBuilder patternBuilder(@NotNull InventoryType inventoryType){
+	public static InventoryGUIPatternBuilder patternBuilder(@NotNull InventoryType inventoryType){
 		return new InventoryGUIBuilder(inventoryType == InventoryType.CHEST ? ChestRows.THREE : ChestRows.ONE, inventoryType).patternBuilder();
 	}
 
