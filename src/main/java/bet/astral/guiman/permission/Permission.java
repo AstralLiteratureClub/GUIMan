@@ -37,9 +37,73 @@ public interface Permission {
 		return new BiPreicatePermission(predicate, display, runAction);
 	}
 
+	static @NotNull Permission and(@NotNull Permission permission, @NotNull Permission permission2){
+		return new AndPermission(permission, permission);
+	}
+	static @NotNull Permission or(@NotNull Permission permission, @NotNull Permission permission2){
+		return new OrPermission(permission, permission);
+	}
+
+	default Permission and(@NotNull Permission permission){
+		return and(this, permission);
+	}
+	default Permission or(@NotNull Permission permission){
+		return or(this, permission);
+	}
+
 	boolean hasPermission(Player player, InventoryGUI inventoryGUI);
 	boolean displayIfHasNoPermission();
 	boolean runActionIfHasNoPermission();
+	class AndPermission implements Permission {
+		private final Permission one;
+		private final Permission two;
+
+		public AndPermission(Permission one, Permission two) {
+			this.one = one;
+			this.two = two;
+		}
+
+
+		@Override
+		public boolean hasPermission(Player player, InventoryGUI inventoryGUI) {
+			return one.hasPermission(player, inventoryGUI) && two.hasPermission(player, inventoryGUI);
+		}
+
+		@Override
+		public boolean displayIfHasNoPermission() {
+			return one.displayIfHasNoPermission() && two.displayIfHasNoPermission();
+		}
+
+		@Override
+		public boolean runActionIfHasNoPermission() {
+			return one.runActionIfHasNoPermission() && two.runActionIfHasNoPermission();
+		}
+	}
+	class OrPermission implements Permission {
+		private final Permission one;
+		private final Permission two;
+
+		public OrPermission(Permission one, Permission two) {
+			this.one = one;
+			this.two = two;
+		}
+
+
+		@Override
+		public boolean hasPermission(Player player, InventoryGUI inventoryGUI) {
+			return one.hasPermission(player, inventoryGUI) || two.hasPermission(player, inventoryGUI);
+		}
+
+		@Override
+		public boolean displayIfHasNoPermission() {
+			return one.displayIfHasNoPermission() || two.displayIfHasNoPermission();
+		}
+
+		@Override
+		public boolean runActionIfHasNoPermission() {
+			return one.runActionIfHasNoPermission() || two.runActionIfHasNoPermission();
+		}
+	}
 	class NonePermission implements Permission {
 		@Override
 		public boolean hasPermission(Player player, InventoryGUI gui) {
