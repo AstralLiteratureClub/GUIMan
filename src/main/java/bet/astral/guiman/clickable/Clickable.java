@@ -101,8 +101,8 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 * @param itemStack item stack
 	 * @return clickable
 	 */
-	public static Clickable noTooltip(ItemStack itemStack) {
-		return new ClickableBuilder(itemStack).hideTooltip().build();
+	public static ClickableBuilder noTooltip(ItemStack itemStack) {
+		return new ClickableBuilder(itemStack).hideTooltip();
 	}
 
 	/**
@@ -110,8 +110,8 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 * @param material material
 	 * @return clickable
 	 */
-	public static Clickable noTooltip(@NotNull Material material) {
-		return Clickable.builder(material).hideTooltip().build();
+	public static ClickableBuilder noTooltip(@NotNull Material material) {
+		return Clickable.builder(material).hideTooltip();
 	}
 
 	/**
@@ -131,8 +131,8 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 * @param action action
 	 * @return clickable
 	 */
-	public static Clickable general(ItemStack itemStack, ClickAction action){
-		return new ClickableBuilder(itemStack).actionGeneral(action).build();
+	public static ClickableBuilder general(ItemStack itemStack, ClickAction action){
+		return new ClickableBuilder(itemStack).actionGeneral(action);
 	}
 
 	/**
