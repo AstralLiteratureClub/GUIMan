@@ -38,12 +38,23 @@ public interface Permission {
 	}
 
 	static @NotNull Permission and(@NotNull Permission permission, @NotNull Permission permission2){
-		return new AndPermission(permission, permission);
+		return new AndPermission(permission, permission2, false, false);
 	}
 	static @NotNull Permission or(@NotNull Permission permission, @NotNull Permission permission2){
-		return new OrPermission(permission, permission);
+		return new OrPermission(permission, permission2, false, false);
 	}
-
+	static @NotNull Permission and(@NotNull Permission permission, @NotNull Permission permission2, boolean display, boolean runAction){
+		return new AndPermission(permission, permission2, display, runAction);
+	}
+	static @NotNull Permission or(@NotNull Permission permission, @NotNull Permission permission2, boolean display, boolean runAction){
+		return new OrPermission(permission, permission2, display, runAction);
+	}
+	default Permission and(@NotNull Permission permission, boolean display, boolean runAction){
+		return and(this, permission, display, runAction);
+	}
+	default Permission or(@NotNull Permission permission, boolean display, boolean runAction){
+		return or(this, permission, display, runAction);
+	}
 	default Permission and(@NotNull Permission permission){
 		return and(this, permission);
 	}
@@ -57,10 +68,13 @@ public interface Permission {
 	class AndPermission implements Permission {
 		private final Permission one;
 		private final Permission two;
-
-		public AndPermission(Permission one, Permission two) {
+		private final boolean display;
+		private final boolean runAction;
+		public AndPermission(Permission one, Permission two, boolean display, boolean runAction) {
 			this.one = one;
 			this.two = two;
+			this.display = display;
+			this.runAction = runAction;
 		}
 
 
@@ -71,21 +85,25 @@ public interface Permission {
 
 		@Override
 		public boolean displayIfHasNoPermission() {
-			return one.displayIfHasNoPermission() && two.displayIfHasNoPermission();
+			return display;
 		}
 
 		@Override
 		public boolean runActionIfHasNoPermission() {
-			return one.runActionIfHasNoPermission() && two.runActionIfHasNoPermission();
+			return runAction;
 		}
 	}
 	class OrPermission implements Permission {
 		private final Permission one;
 		private final Permission two;
+		private final boolean display;
+		private final boolean runAction;
 
-		public OrPermission(Permission one, Permission two) {
+		public OrPermission(Permission one, Permission two, boolean display, boolean runAction) {
 			this.one = one;
 			this.two = two;
+			this.display = display;
+			this.runAction = runAction;
 		}
 
 
@@ -96,12 +114,12 @@ public interface Permission {
 
 		@Override
 		public boolean displayIfHasNoPermission() {
-			return one.displayIfHasNoPermission() || two.displayIfHasNoPermission();
+			return display;
 		}
 
 		@Override
 		public boolean runActionIfHasNoPermission() {
-			return one.runActionIfHasNoPermission() || two.runActionIfHasNoPermission();
+			return runAction;
 		}
 	}
 	class NonePermission implements Permission {
