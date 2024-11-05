@@ -1,6 +1,6 @@
 package bet.astral.guiman.clickable;
 
-import bet.astral.messenger.v2.MessageSender;
+import bet.astral.messenger.v2.utils.MessageSender;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import org.jetbrains.annotations.NotNull;
 
