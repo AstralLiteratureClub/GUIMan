@@ -54,12 +54,19 @@ public class InventoryGUIBuilder implements Cloneable {
 	}
 
 	/**
-	 * Creates chest inventory gui builder. Chest inventories is the most supported inventory type of GUIMan
+	 * Creates chest inventory gui builder.
 	 * @param rows how many rows
 	 */
 	@Deprecated(forRemoval = true)
-	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
-	public InventoryGUIBuilder(@Range(from = 1, to = 6) int rows){
+	public InventoryGUIBuilder(ChestRows rows){
+		this(rows, InventoryType.CHEST);
+	}
+	/**
+	 * Creates chest inventory gui builder.
+	 * @param rows how many rows
+	 */
+	@Deprecated(forRemoval = true)
+	public InventoryGUIBuilder(@Range(from=1,to=6) int rows){
 		this(ChestRows.rows(rows), InventoryType.CHEST);
 	}
 
@@ -84,7 +91,6 @@ public class InventoryGUIBuilder implements Cloneable {
 	 * @param type inventoryType
 	 */
 	@Deprecated(forRemoval = true)
-	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
 	public InventoryGUIBuilder(InventoryType type) throws IllegalArgumentException{
 		this(ChestRows.ONE, type);
 	}
