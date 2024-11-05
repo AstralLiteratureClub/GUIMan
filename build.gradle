@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id("io.papermc.paperweight.userdev") version "1.7.1"
+    id("io.papermc.paperweight.userdev") version "1.7.4"
 }
 
 group = 'bet.astral'
@@ -20,11 +20,11 @@ repositories {
     }
 }
 
-var serverVersion = "1.21"
+var serverVersion = "1.21.3"
 
 dependencies {
-    compileOnly("bet.astral:messenger:2.0.6")
-    compileOnly("bet.astral:more4j:1.0.0")
+    compileOnly("bet.astral:messenger:2.3.0")
+    compileOnly("bet.astral:more4j:1.0.2")
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
@@ -33,7 +33,7 @@ dependencies {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(22))
 }
 
 publishing {
