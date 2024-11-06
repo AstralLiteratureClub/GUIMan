@@ -7,6 +7,7 @@ import bet.astral.messenger.v2.info.MessageInfoBuilder;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.receiver.Receiver;
+import bet.astral.messenger.v2.translation.Translation;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import bet.astral.more4j.function.consumer.TriConsumer;
 import de.cubbossa.translations.ComponentSplit;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -43,7 +45,9 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	public static final NamespacedKey ITEM_KEY = new NamespacedKey("guiman", "guiman_inventory_item");
 	static final Random RANDOM = new Random(System.nanoTime());
 	public static final Clickable EMPTY = Clickable.builder(Material.AIR).priority(0).displayIfNoPermissions().build();
-	static final Component PERMISSION_MESSAGE = Component.text("Sorry, but you do not have permissions to use this", NamedTextColor.RED);
+	@ApiStatus.Obsolete
+	public static final Component PERMISSION_MESSAGE_DEFAULT = Component.text("Sorry, but you do not have permissions to use this", NamedTextColor.RED);
+	public static final TranslationKey PERMISSION_MESSAGE_TRANSLATION = TranslationKey.of("guiman.clickable.no-permissions");
 
 	private final int priority;
 	@NotNull
@@ -295,10 +299,16 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	}
 
 	public void sendPermissionMessage(Player player, @Nullable Messenger messenger) {
-		if (messenger == null || permissionMessage == null){
-			player.sendMessage(PERMISSION_MESSAGE);
+		if (permissionMessage == null){
+			if (messenger.getLocaleFromReceiver(player) != null
+					&& messenger.getBaseComponent(PERMISSION_MESSAGE_TRANSLATION, Objects.requireNonNull(messenger.getLocaleFromReceiver(player)))!=null){
+				messenger.message(player, PERMISSION_MESSAGE_TRANSLATION);
+			}
 		} else {
-			messenger.message(player, permissionMessage);
+			if (messenger != null) {
+				messenger.message(player, permissionMessage);
+			}
 		}
+		player.sendMessage(PERMISSION_MESSAGE_DEFAULT);
 	}
 }
