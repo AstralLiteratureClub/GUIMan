@@ -421,6 +421,7 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @return this
 	 */
 	@NotNull
+	@Deprecated(forRemoval = true)
 	public ClickableBuilder actionGeneral(@NotNull TriConsumer<Clickable, ItemStack, Player> action){
 		action(ClickType.SHIFT_LEFT, action);
 		action(ClickType.SHIFT_RIGHT, action);
