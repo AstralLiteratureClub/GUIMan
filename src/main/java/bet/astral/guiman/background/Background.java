@@ -1,20 +1,23 @@
 package bet.astral.guiman.background;
 
+import bet.astral.guiman.background.builders.BorderPatternBuilder;
+import bet.astral.guiman.background.builders.CheckeredPatternBuilder;
+import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.clickable.ClickableLike;
+import bet.astral.guiman.utils.ChestRows;
 import lombok.Getter;
-import org.jetbrains.annotations.ApiStatus;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.util.Optional;
 
 @Getter
-@ApiStatus.OverrideOnly
-@SuppressWarnings("JavadocDeclaration")
 public abstract class Background {
 	/**
 	 *  Returns the clickable associated with empty slots.
-	 * @return clickable as
 	 */
 	@NotNull
 	private final ClickableLike empty;
@@ -42,4 +45,131 @@ public abstract class Background {
 	 */
 	@NotNull
 	public abstract ClickableLike getSlotOrEmpty(int slot);
+
+	/**
+	 * Empty background air as the background item
+	 */
+	public static Background EMPTY = noTooltip(Material.AIR);
+
+	/**
+	 * Returns single item background with given material.
+	 *
+	 * @param material material
+	 * @return single item background
+	 */
+	public static Background tooltip(Material material) {
+		return new StaticBackground(material);
+	}
+	/**
+	 * Returns single item background with given material.
+	 *
+	 * @param material material
+	 * @return single item background
+	 */
+	public static Background tooltip(ItemStack material) {
+		return new StaticBackground(Clickable.builder(material));
+	}
+
+	/**
+	 * Returns single item background with given material.
+	 *
+	 * @param clickable material
+	 * @return single item background
+	 */
+	public static Background tooltip(ClickableLike clickable) {
+		return new StaticBackground(clickable);
+	}
+
+	/**
+	 * Returns single item background with given material and without hover tooltip.
+	 *
+	 * @param material material
+	 * @return single item background
+	 */
+	public static Background noTooltip(Material material) {
+		return noTooltip(ItemStack.of(material));
+	}
+	/**
+	 * Returns single item background with given material and without hover tooltip.
+	 *
+	 * @param material material
+	 * @return single item background
+	 */
+	public static Background noTooltip(ItemStack material) {
+		return new StaticBackground(Clickable.noTooltip(material));
+	}
+
+	/**
+	 * Creates a check board style background with chunk size being chunkSize*chunkSize,
+	 * first clickable being "black" square and second being "white" square
+	 *
+	 * @param chunkSize square size
+	 * @param first     fist clickable
+	 * @param second    second clickable
+	 * @return background
+	 */
+	public static Background checkered(int chunkSize, Material first, Material second) {
+		return new CheckeredPatternBuilder().chunkSize(chunkSize).first(first).second(second).build();
+	}
+
+	/**
+	 * Creates a check board style background with chunk size being chunkSize*chunkSize,
+	 * first clickable being "black" square and second being "white" square
+	 *
+	 * @param chunkSize square size
+	 * @param first     fist clickable
+	 * @param second    second clickable
+	 * @return background
+	 */
+	public static Background checkered(int chunkSize, ClickableLike first, ClickableLike second) {
+		return new CheckeredPatternBuilder().chunkSize(chunkSize).first(first).second(second).build();
+	}
+
+	/**
+	 * Creates a pattern for chest GUIs which have borders.
+	 * For more customization of border pattern use {@link BorderPatternBuilder}.
+	 * @param rows rows
+	 * @param borderClickable border
+	 * @param nonBorderClickable non border, empty slots
+	 * @return new background
+	 */
+	public static Background border(@Range(from = 3, to = 6) int rows, @NotNull ClickableLike borderClickable, @NotNull ClickableLike nonBorderClickable){
+		return new BorderPatternBuilder().rows(rows).border(borderClickable).nonBorder(nonBorderClickable).build();
+	}
+
+	/**
+	 * Creates a pattern for chest GUIs which have borders.
+	 * For more customization of border pattern use {@link BorderPatternBuilder}.
+	 * @param rows rows
+	 * @param borderClickable border
+	 * @param nonBorderClickable non border, empty slots
+	 * @return new background
+	 */
+	public static Background border(@Range(from = 3, to = 6) int rows, @NotNull Material borderClickable, @NotNull Material nonBorderClickable){
+		return new BorderPatternBuilder().rows(rows).border(borderClickable).nonBorder(nonBorderClickable).build();
+	}
+
+	/**
+	 * Creates a pattern for chest GUIs which have borders.
+	 * For more customization of border pattern use {@link BorderPatternBuilder}.
+	 * @param rows rows
+	 * @param borderClickable border
+	 * @param nonBorderClickable non border, empty slots
+	 * @return new background
+	 */
+	public static Background border(@NotNull ChestRows rows, @NotNull ClickableLike borderClickable, @NotNull ClickableLike nonBorderClickable){
+		return new BorderPatternBuilder().rows(rows).border(borderClickable).nonBorder(nonBorderClickable).build();
+	}
+
+	/**
+	 * Creates a pattern for chest GUIs which have borders.
+	 * For more customization of border pattern use {@link BorderPatternBuilder}.
+	 * @param rows rows
+	 * @param borderClickable border
+	 * @param nonBorderClickable non border, empty slots
+	 * @return new background
+	 */
+	public static Background border(@NotNull ChestRows rows, @NotNull Material borderClickable, @NotNull Material nonBorderClickable){
+		return new BorderPatternBuilder().rows(rows).border(borderClickable).nonBorder(nonBorderClickable).build();
+	}
 }

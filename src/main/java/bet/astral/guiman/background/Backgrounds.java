@@ -10,7 +10,9 @@ import org.jetbrains.annotations.Range;
 
 /**
  * Provides default backgrounds for guiman inventory GUIs
+ * @deprecated Use {@link Background}
  */
+@Deprecated(forRemoval = true)
 public class Backgrounds {
 	private Backgrounds() {
 	}
