@@ -54,7 +54,8 @@ public class InventoryClickListener implements Listener {
 			if (action == null){
 				return;
 			}
-			ClickContext context = new ClickContext(gui, event.getInventory(), itemStack, event.getClick(), player, clickable);
+			ClickContext context = new ClickContext(gui, event.getInventory(), itemStack, event.getClick(), player, clickable,
+					new ClickContext.MessengerInfo(gui.getMessenger(), gui.getMessenger() != null ? gui.getMessenger().convertReceiver(player) : null, gui.getMessenger() != null));
 			if (clickable.isAsync()){
 				CompletableFuture.runAsync(()->{
 					try {

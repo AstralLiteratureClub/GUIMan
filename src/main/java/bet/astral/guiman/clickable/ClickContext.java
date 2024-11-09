@@ -1,6 +1,9 @@
 package bet.astral.guiman.clickable;
 
 import bet.astral.guiman.gui.InventoryGUI;
+import bet.astral.messenger.v2.Messenger;
+import bet.astral.messenger.v2.receiver.Receiver;
+import bet.astral.messenger.v2.utils.MessageSender;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -17,4 +20,13 @@ public final class ClickContext {
 	private final ClickType clickType;
 	private final Player who;
 	private final Clickable clickable;
+	private final MessengerInfo messengerInfo;
+
+	@Getter
+	@RequiredArgsConstructor
+	public static final class MessengerInfo implements MessageSender.Packed {
+		private final Messenger messenger;
+		private final Receiver receiver;
+		private final boolean isMessengerSet;
+	}
 }
