@@ -4,8 +4,7 @@ import bet.astral.guiman.clickable.ClickableLike;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Background implementation with a pattern which can be defined by {@link bet.astral.guiman.background.builders.PatternBackgroundBuilder}
@@ -37,6 +36,20 @@ public class PatternBackground extends Background{
 	public @NotNull ClickableLike getSlotOrEmpty(int slot) {
 		Character character = slots.get(slot);
 		ClickableLike clickable = clickables.get(character);
-		return clickable != null ? clickable : getEmpty();
+		return clickable != null ? clickable : getEmptySlot();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return clickables.isEmpty();
+	}
+
+	@Override
+	public @NotNull Iterator<ClickableLike> iterator() {
+		List<ClickableLike> list = new LinkedList<>();
+		for (int i = 0; i < 54; i++){
+			list.add(getSlotOrEmpty(i));
+		}
+		return list.iterator();
 	}
 }

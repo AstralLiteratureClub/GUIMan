@@ -15,12 +15,14 @@ import org.jetbrains.annotations.Range;
 import java.util.Optional;
 
 @Getter
-public abstract class Background {
+public abstract class Background implements Iterable<ClickableLike> {
 	/**
 	 *  Returns the clickable associated with empty slots.
 	 */
 	@NotNull
+	@Deprecated
 	private final ClickableLike empty;
+	private final ClickableLike emptySlot;
 
 	/**
 	 * Creates a new background instance
@@ -28,6 +30,7 @@ public abstract class Background {
 	 */
 	protected Background(@NotNull ClickableLike empty) {
 		this.empty = empty;
+		this.emptySlot = empty;
 	}
 
 	/**
@@ -67,7 +70,7 @@ public abstract class Background {
 	 * @return single item background
 	 */
 	public static Background tooltip(ItemStack material) {
-		return new StaticBackground(Clickable.builder(material));
+		return new StaticBackground(Clickable.builder(material), material.isEmpty());
 	}
 
 	/**
@@ -96,7 +99,7 @@ public abstract class Background {
 	 * @return single item background
 	 */
 	public static Background noTooltip(ItemStack material) {
-		return new StaticBackground(Clickable.noTooltip(material));
+		return new StaticBackground(Clickable.noTooltip(material), material.isEmpty());
 	}
 
 	/**
@@ -172,4 +175,10 @@ public abstract class Background {
 	public static Background border(@NotNull ChestRows rows, @NotNull Material borderClickable, @NotNull Material nonBorderClickable){
 		return new BorderPatternBuilder().rows(rows).border(borderClickable).nonBorder(nonBorderClickable).build();
 	}
+
+	/**
+	 * Returns true if the inventory is made of air and contains nothing else.
+	 * @return true if air and no actions found
+	 */
+	public abstract boolean isEmpty();
 }
