@@ -6,7 +6,6 @@ import bet.astral.guiman.background.Background;
 import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.clickable.ClickableLike;
 import bet.astral.guiman.clickable.ClickableProvider;
-import bet.astral.guiman.permission.Permission;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.component.ComponentType;
 import bet.astral.messenger.v2.info.MessageInfoBuilder;
@@ -25,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Interactable GUI which players click on.
@@ -63,12 +61,14 @@ public class InteractableGUI implements InventoryHolder {
 		} else {
 			Component name = null;
 			// Return translation key as name, if messenger is null
-			if (gui.getName() == null && gui.getMessenger() == null){
+			if (gui.getNameTranslation() != null && gui.getMessenger() == null){
 				inventory = createFunction.apply(this, obj, Component.translatable(gui.getNameTranslation()));
                 GUIMan.GUIMAN.getPlugin().getSLF4JLogger().warn("Messenger is not set for inventory {}, {}", gui.getNameTranslation().translationKey(), new Throwable());
-			} else if (gui.getName()==null){
+			} else if (gui.getNameTranslation() != null){
+				// load messenger transltion for the GUI title
 				Locale locale = gui.getMessenger().getLocaleFromReceiver(player);
 
+				// Build the info to simplify the later parsing
 				MessageInfoBuilder messageInfo = new MessageInfoBuilder(gui.getNameTranslation())
 						.withPlaceholders(gui.getPlaceholderGenerator().apply(player));
 				if (locale != null){
@@ -78,6 +78,7 @@ public class InteractableGUI implements InventoryHolder {
 				Receiver receiver = gui.getMessenger().convertReceiver(player);
 				assert receiver != null;
 
+				// Parse the gui name
 				name = gui.getMessenger()
 						.parseComponent(messageInfo.create(), ComponentType.CHAT, receiver);
 				inventory = createFunction.apply(this, obj, name);
@@ -85,11 +86,11 @@ public class InteractableGUI implements InventoryHolder {
 				name = gui.getName();
 				inventory = createFunction.apply(this, obj, name);
 			}
-			generate(player, gui.getMessenger());
 		}
+		generate(player, gui.getMessenger());
 	}
 
-	public void generate(@NotNull Player player, @NotNull Messenger messenger){
+	public void generate(@NotNull Player player, @Nullable Messenger messenger){
 		try {
 			deployBackground(player, messenger);
 			deployClickables(player, messenger);
@@ -167,7 +168,7 @@ public class InteractableGUI implements InventoryHolder {
 
 			// empty -> return
 			if (clickables.isEmpty()){
-				return;
+				continue;
 			}
 
 			// Resort everything
