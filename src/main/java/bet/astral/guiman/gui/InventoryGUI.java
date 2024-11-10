@@ -41,7 +41,7 @@ import java.util.function.Function;
  * Allows messenger-based translation GUIs to require only one GUI per server.
  */
 @Getter
-public class InventoryGUI {
+public class InventoryGUI  {
 	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
 	@Deprecated(forRemoval = true)
 	public static void init(@NotNull JavaPlugin plugin){
@@ -178,13 +178,12 @@ public class InventoryGUI {
 
 	/**
 	 * Registers clickable to generated when making player inventories
-	 * @param clickableLike clickable to generate
+	 * @param clickable clickable to register
 	 * @param player player to provide for
 	 * @return given clickable
 	 */
 	@ApiStatus.Internal
-	public Clickable registerClickable(@NotNull ClickableLike clickableLike, @NotNull Player player) {
-		Clickable clickable = clickableLike instanceof ClickableProvider clickableProvider ? clickableProvider.provide(player) : clickableLike.asClickable();
+	public Clickable registerClickable(@NotNull Clickable clickable, @NotNull Player player) {
 		ids.put(clickable.getId(), clickable);
 		return clickable;
 	}
@@ -198,20 +197,36 @@ public class InventoryGUI {
 	public void open(Player player) {
 		CompletableFuture.runAsync(()->{
 			try {
+				GUIMan guiMan = GUIMan.GUIMAN;
 				this.getPlayers().putIfAbsent(player, new InteractableGUI(this, player));
 				InteractableGUI gui = players.get(player);
+				guiMan.getPlugin().getSLF4JLogger().error("11");
 				if (gui == null) {
+					guiMan.getPlugin().getSLF4JLogger().error("12");
 					gui = new InteractableGUI(this, player);
+					guiMan.getPlugin().getSLF4JLogger().error("13");
 					gui.generate(player, messenger);
+					guiMan.getPlugin().getSLF4JLogger().error("14");
 				} else if (regenerateItems) {
+					guiMan.getPlugin().getSLF4JLogger().error("15");
 					gui.generate(player, messenger);
+					guiMan.getPlugin().getSLF4JLogger().error("16");
 				}
 
+				guiMan.getPlugin().getSLF4JLogger().error("17");
 				final InteractableGUI interactableGUI = gui;
-				player.getScheduler().run(GUIMan.GUIMAN.getPlugin(), t -> player.openInventory(interactableGUI.getInventory()), null);
+				player.getScheduler().run(GUIMan.GUIMAN.getPlugin(), t ->{
+					guiMan.getPlugin().getSLF4JLogger().error("19");
+					player.openInventory(interactableGUI.getInventory());
+					guiMan.getPlugin().getSLF4JLogger().error("20");
+				} , null);
+				guiMan.getPlugin().getSLF4JLogger().error("18");
 			} catch (Exception e){
 				GUIMan.GUIMAN.getPlugin().getSLF4JLogger().error("Error while trying to open GUI to {}", player.getName(), e);
 			}
+		}).exceptionally(throwable->{
+			GUIMan.GUIMAN.getPlugin().getSLF4JLogger().error("Caught exception while trying to open GUI inventory!", throwable);
+			return null;
 		});
 	}
 

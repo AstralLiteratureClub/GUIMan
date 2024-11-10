@@ -1,5 +1,6 @@
 package bet.astral.guiman.internals;
 
+import bet.astral.guiman.GUIMan;
 import bet.astral.guiman.gui.InventoryGUI;
 import bet.astral.guiman.background.Background;
 import bet.astral.guiman.clickable.Clickable;
@@ -9,16 +10,21 @@ import bet.astral.guiman.permission.Permission;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.component.ComponentType;
 import bet.astral.messenger.v2.info.MessageInfoBuilder;
+import bet.astral.messenger.v2.receiver.Receiver;
+import bet.astral.more4j.function.function.TriFunction;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -27,6 +33,17 @@ import java.util.stream.Collectors;
  */
 @ApiStatus.Internal
 public class InteractableGUI implements InventoryHolder {
+	public static final TriFunction<InventoryHolder, Object, Component, Inventory> createFunction = (holder, t, name)-> {
+		if (t instanceof Integer size){
+			if (name == null)
+				return Bukkit.createInventory(holder, size);
+			return Bukkit.createInventory(holder, size, name);
+		} else {
+			if (name == null)
+				return Bukkit.createInventory(holder, (InventoryType) t);
+			return Bukkit.createInventory(holder, (InventoryType) t, name);
+		}};
+
 	private final InventoryGUI gui;
 	private final Inventory inventory;
 
@@ -38,88 +55,132 @@ public class InteractableGUI implements InventoryHolder {
 	@ApiStatus.Internal
 	public InteractableGUI(@NotNull InventoryGUI gui, @NotNull Player player) {
 		this.gui = gui;
-		if (gui.getType() == InventoryType.CHEST) {
-			if (gui.getName() == null && gui.getNameTranslation() == null) {
-				inventory = Bukkit.createInventory(this, gui.getSlots());
-			} else {
-				inventory = Bukkit.createInventory(this, gui.getSlots(), gui.getNameTranslation() != null ?
-						gui.getMessenger().parseComponent(new MessageInfoBuilder(gui.getNameTranslation())
-								.withPlaceholders(gui.getPlaceholderGenerator().apply(player)).create(), ComponentType.CHAT, gui.getMessenger().convertReceiver(player)) : gui.getName());
-			}
+
+		Object obj = gui.getType() == InventoryType.CHEST ? gui.getSlots() : gui.getType();
+		// Return default inventory, if inventory name is null
+		if (gui.getNameTranslation() == null && gui.getName() == null) {
+			inventory = createFunction.apply(this, obj, null);
 		} else {
-			if (gui.getName() == null) {
-				inventory = Bukkit.createInventory(this, gui.getType());
+			Component name = null;
+			// Return translation key as name, if messenger is null
+			if (gui.getName() == null && gui.getMessenger() == null){
+				inventory = createFunction.apply(this, obj, Component.translatable(gui.getNameTranslation()));
+                GUIMan.GUIMAN.getPlugin().getSLF4JLogger().warn("Messenger is not set for inventory {}, {}", gui.getNameTranslation().translationKey(), new Throwable());
+			} else if (gui.getName()==null){
+				Locale locale = gui.getMessenger().getLocaleFromReceiver(player);
+
+				MessageInfoBuilder messageInfo = new MessageInfoBuilder(gui.getNameTranslation())
+						.withPlaceholders(gui.getPlaceholderGenerator().apply(player));
+				if (locale != null){
+					messageInfo.withLocale(locale);
+				}
+
+				Receiver receiver = gui.getMessenger().convertReceiver(player);
+				assert receiver != null;
+
+				name = gui.getMessenger()
+						.parseComponent(messageInfo.create(), ComponentType.CHAT, receiver);
+				inventory = createFunction.apply(this, obj, name);
 			} else {
-				inventory = Bukkit.createInventory(this, gui.getType(), gui.getNameTranslation() != null ?
-						gui.getMessenger().parseComponent(new MessageInfoBuilder(gui.getNameTranslation())
-								.withPlaceholders(gui.getPlaceholderGenerator().apply(player)).create(), ComponentType.CHAT, gui.getMessenger().convertReceiver(player)) : gui.getName());
+				name = gui.getName();
+				inventory = createFunction.apply(this, obj, name);
 			}
+			generate(player, gui.getMessenger());
 		}
-		generate(player, gui.getMessenger());
 	}
 
-	/**
-	 * Generates the chest inventory view to the inventory.
-	 * Allows usage of messenger to set name of titles and lore of items and the inventory itself
-	 * @param player player
-	 * @param messenger (Nullable) messenger
-	 */
-	public void generate(@NotNull Player player, @Nullable Messenger messenger) {
+	public void generate(@NotNull Player player, @NotNull Messenger messenger){
 		try {
-			inventory.clear();
-			Background background = gui.getBackground();
-			for (int i = 0; i < inventory.getSize(); i++) {
-				if (i > inventory.getSize()) {
-					return;
-				}
-
-				boolean isBackground = false;
-				Collection<ClickableLike> clickables = gui.getClickables().get(i);
-				if (clickables == null || clickables.isEmpty()) {
-					if (gui.getBackground() != null) {
-						ClickableLike clickableLike = background.getSlotOrEmpty(i);
-						clickables = List.of(clickableLike);
-						isBackground = true;
-					} else {
-						return;
-					}
-				}
-
-				List<Clickable> clickableList =
-						clickables.
-								stream().
-								map(clickableLike ->
-										clickableLike instanceof ClickableProvider provider
-												? provider.provide(player)
-												: clickableLike.asClickable())
-								.distinct()
-								.sorted()
-								.collect(Collectors.toList());
-				Collections.reverse(clickableList);
-
-				for (Clickable clickable : clickableList) {
-					if (clickable == null) {
-						clickable = gui.registerClickable(background.getSlotOrEmpty(i), player);
-						isBackground = true;
-					}
-					gui.registerClickable(clickable, player);
-					if (!isBackground && hasPermission(player, clickable.getPermission(), gui)) {
-						inventory.setItem(i, clickable.generate(messenger, player));
-						break;
-					} else if (!isBackground && !hasPermission(player, clickable.getPermission(), gui) && clickable.isDisplayIfNoPermissions()) {
-						inventory.setItem(i, clickable.generate(messenger, player));
-						break;
-					} else if (isBackground){
-						inventory.setItem(i, clickable.generate(messenger, player));
-						break;
-					}
-				}
-			}
-		} catch (Exception e){
-			if (gui.getGenerationExceptionPlayerHandler() != null){
+			deployBackground(player, messenger);
+			deployClickables(player, messenger);
+		} catch (Exception e) {
+			if (gui.getGenerationExceptionPlayerHandler() != null) {
 				gui.getGenerationExceptionPlayerHandler().accept(player);
 			}
-			throw new RuntimeException(e);
+			throw e;
+		}
+	}
+
+	public void deployBackground(@NotNull Player player, @NotNull Messenger messenger){
+		// Check if no background | background is empty -> return
+		if (gui.getBackground() == null || gui.getBackground().isEmpty()){
+			return;
+		}
+		inventory.clear();
+		Background background = gui.getBackground();
+		// Loop every slot
+		for (int i = 0; i < inventory.getSize(); i++){
+			if (i > inventory.getSize()){
+				return;
+			}
+
+			// Get default clickable
+			ClickableLike clickableLike = background.getSlotOrEmpty(i);
+			// Make sure clickable is a real clickable and not a provider
+			Clickable clickable = clickableLike instanceof ClickableProvider provider ? provider.provide(player) : clickableLike.asClickable();
+			// Register background to be sure it's real clickable in the systems
+			gui.registerClickable(clickable, player);
+
+			// Generate a new item, as clickable(s) are made for each player separately. Because of messenger allows multiple languages
+			ItemStack itemStack = clickable.generate(messenger, player);
+
+			inventory.setItem(i, itemStack);
+		}
+	}
+
+	public void deployClickables(@NotNull Player player, @NotNull Messenger messenger){
+		// Check if there are ANY clickables
+		if (gui.getClickables().isEmpty()){
+			// None -> Return
+			return;
+		}
+
+
+		Map<Integer, Collection<ClickableLike>> clickablesBySlot = gui.getClickables();
+		// Loop every slot
+		for (int i = 0; i < inventory.getSize(); i++){
+			if (i > inventory.getSize()){
+				return;
+			}
+
+			// Don't continue to stream if the list is an empty // null one
+			if (clickablesBySlot.get(i)==null || clickablesBySlot.get(i).isEmpty()){
+				continue;
+			}
+
+			// Get clickables
+			List<ClickableLike> clickableLikes = new LinkedList<>(clickablesBySlot.get(i));
+			List<Clickable> clickables = new ArrayList<>(clickableLikes
+                    .stream()
+                    // Make all clickable likes clickables if they are providers
+                    .map(clickableLike ->
+                            clickableLike instanceof ClickableProvider provider ? provider.provide(player) : clickableLike.asClickable())
+                    // sort clickables (priority low -> high)
+                    .distinct()
+                    .sorted()
+                    // Return
+                    .toList());
+			// Turn clickables around high -> low
+			clickables.reversed();
+
+			clickables.removeIf(clickable->!clickable.getPermission().hasPermission(player, gui) && !clickable.isDisplayIfNoPermissions());
+
+			// empty -> return
+			if (clickables.isEmpty()){
+				return;
+			}
+
+			// Resort everything
+			clickables.sort(Clickable::compareTo);
+			clickables.reversed();
+
+			// Register
+			Clickable clickable = clickables.getFirst();
+			gui.registerClickable(clickable, player);
+
+			// display
+			ItemStack itemStack = clickable.generate(messenger, player);
+			inventory.setItem(i, itemStack);
 		}
 	}
 
@@ -131,22 +192,6 @@ public class InteractableGUI implements InventoryHolder {
 		return gui;
 	}
 
-	/**
-	 * Returns if player has permission to use given permission. Returns true if player or permission is null
-	 * @param player player
-	 * @param permission permission
-	 * @param gui the gui
-	 * @return has permission
-	 */
-	private boolean hasPermission(@Nullable Player player, Permission permission, InventoryGUI gui){
-		if (permission==null){
-			return true;
-		}
-		if (player == null){
-			return true;
-		}
-		return permission.hasPermission(player, gui);
-	}
 	/**
 	 * Returns the bukkit inventory for this interactable gui
 	 * @return inventory
