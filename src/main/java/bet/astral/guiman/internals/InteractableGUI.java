@@ -103,7 +103,7 @@ public class InteractableGUI implements InventoryHolder {
 		}
 	}
 
-	public void deployBackground(@NotNull Player player, @NotNull Messenger messenger){
+	public void deployBackground(@NotNull Player player, @Nullable Messenger messenger){
 		// Check if no background | background is empty -> return
 		if (gui.getBackground() == null || gui.getBackground().isEmpty()){
 			return;
@@ -125,12 +125,11 @@ public class InteractableGUI implements InventoryHolder {
 
 			// Generate a new item, as clickable(s) are made for each player separately. Because of messenger allows multiple languages
 			ItemStack itemStack = clickable.generate(messenger, player);
-
 			inventory.setItem(i, itemStack);
 		}
 	}
 
-	public void deployClickables(@NotNull Player player, @NotNull Messenger messenger){
+	public void deployClickables(@NotNull Player player, @Nullable Messenger messenger){
 		// Check if there are ANY clickables
 		if (gui.getClickables().isEmpty()){
 			// None -> Return

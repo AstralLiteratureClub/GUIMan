@@ -508,7 +508,17 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 * @return this
 	 */
 	public Clickable build(){
-		return new Clickable(priority, itemStack, permission, displayIfNoPermissions, actions, data, async, permissionMessage, itemName, itemLore, placeholderGenerator);
+		return new Clickable(priority,
+				itemStack,
+				permission,
+				displayIfNoPermissions,
+				actions,
+				data,
+				async,
+				permissionMessage,
+				itemName,
+				itemLore,
+				placeholderGenerator);
 	}
 
 	/**
@@ -526,6 +536,10 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 		builder.actions = actions;
 		builder.data = data;
 		builder.async = async;
+		builder.permissionMessage = permissionMessage;
+		builder.itemName = itemName;
+		builder.itemLore = itemLore;
+		builder.placeholderGenerator = placeholderGenerator;
 		return builder;
 	}
 
