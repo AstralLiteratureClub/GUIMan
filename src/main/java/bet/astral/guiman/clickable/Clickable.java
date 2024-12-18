@@ -123,17 +123,6 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 	 * @param action action
 	 * @return clickable
 	 */
-	@Deprecated
-	@ApiStatus.ScheduledForRemoval(inVersion = "1.2.0")
-	public static Clickable general(ItemStack itemStack, TriConsumer<Clickable, ItemStack, Player> action){
-		return new ClickableBuilder(itemStack).actionGeneral(action).build();
-	}
-	/**
-	 * Creates clickable with given item stack and makes the general click actions execute given action
-	 * @param itemStack item stack
-	 * @param action action
-	 * @return clickable
-	 */
 	public static ClickableBuilder general(ItemStack itemStack, ClickAction action){
 		return new ClickableBuilder(itemStack).actionGeneral(action);
 	}

@@ -1,10 +1,11 @@
 package bet.astral.guiman.gui.builders;
 
+import bet.astral.guiman.gui.ClickInventory;
+import bet.astral.guiman.gui.GlobalGUIClickAction;
 import bet.astral.guiman.gui.InventoryGUI;
 import bet.astral.guiman.utils.ChestRows;
 import bet.astral.guiman.background.Background;
 import bet.astral.guiman.background.builders.BackgroundBuilder;
-import bet.astral.guiman.background.Backgrounds;
 import bet.astral.guiman.clickable.ClickableLike;
 import bet.astral.guiman.internals.InteractableGUI;
 import bet.astral.messenger.v2.Messenger;
@@ -13,6 +14,7 @@ import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.jetbrains.annotations.*;
 
@@ -31,6 +33,7 @@ public class InventoryGUIBuilder implements Cloneable {
 	private boolean regenerateItems = false;
 	private final Map<@NotNull Integer, @NotNull Collection<@NotNull ClickableLike>> clickables = new HashMap<>();
 	private Function<Player, PlaceholderCollection> placeholderGenerator = (p)->new PlaceholderList();
+	private final Map<ClickInventory, Map<Integer, Map<ClickType, GlobalGUIClickAction>>> guiClickActions = new HashMap<>();
 	private Consumer<@NotNull Player> closeConsumer;
 	private Consumer<@NotNull Player> openConsumer;
 	private Consumer<Void> builderExceptionPlayerHandler;
@@ -142,12 +145,12 @@ public class InventoryGUIBuilder implements Cloneable {
 	@NotNull
 	public InventoryGUIBuilder background(@Nullable BackgroundBuilder backgroundBuilder) {
 		if (backgroundBuilder == null){
-			this.background = Backgrounds.EMPTY;
+			this.background = Background.EMPTY;
 			return this;
 		}
 		Background background = backgroundBuilder.build();
 		if (background == null){
-			this.background = Backgrounds.EMPTY;
+			this.background = Background.EMPTY;
 			return this;
 		}
 		this.background = background;
@@ -163,7 +166,7 @@ public class InventoryGUIBuilder implements Cloneable {
 	@NotNull
 	public InventoryGUIBuilder background(@Nullable Background background) {
 		if (background == null){
-			this.background = Backgrounds.EMPTY;
+			this.background = Background.EMPTY;
 			return this;
 		}
 		this.background = background;
@@ -280,6 +283,46 @@ public class InventoryGUIBuilder implements Cloneable {
 		return this;
 	}
 
+	public InventoryGUIBuilder guiClickAction(@NotNull ClickInventory clickInventory, int slot, ClickType clickType, GlobalGUIClickAction clickAction){
+		this.guiClickActions.putIfAbsent(clickInventory, new HashMap<>());
+		this.guiClickActions.get(clickInventory).putIfAbsent(slot, new HashMap<>());
+		this.guiClickActions.get(clickInventory).get(slot).put(clickType, clickAction);
+		return this;
+	}
+
+	public InventoryGUIBuilder guiClickAction(@NotNull ClickInventory clickInventory, int slot, List<ClickType> clickType, GlobalGUIClickAction clickAction){
+		this.guiClickActions.putIfAbsent(clickInventory, new HashMap<>());
+		this.guiClickActions.get(clickInventory).putIfAbsent(slot, new HashMap<>());
+		for (ClickType type : clickType) {
+			this.guiClickActions.get(clickInventory).get(slot).put(type, clickAction);
+		}
+		return this;
+	}
+	public InventoryGUIBuilder guiClickAction(@NotNull ClickInventory clickInventory, int slot, ClickType[] clickType, GlobalGUIClickAction clickAction){
+		return guiClickAction(clickInventory, slot, Arrays.asList(clickType), clickAction);
+	}
+	public InventoryGUIBuilder guiGeneralClickAction(@NotNull ClickInventory clickInventory, int slot, GlobalGUIClickAction clickAction){
+		this.guiClickActions.putIfAbsent(clickInventory, new HashMap<>());
+		this.guiClickActions.get(clickInventory).putIfAbsent(slot, new HashMap<>());
+		for (ClickType type : List.of(ClickType.LEFT, ClickType.RIGHT, ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT)) {
+			this.guiClickActions.get(clickInventory).get(slot).put(type, clickAction);
+		}
+		return this;
+	}
+	public InventoryGUIBuilder generalGuiGeneralClickAction(@NotNull ClickInventory clickInventory, GlobalGUIClickAction clickAction){
+		this.guiClickActions.putIfAbsent(clickInventory, new HashMap<>());
+		int slots = InventoryType.PLAYER.getDefaultSize();
+		if (clickInventory==ClickInventory.GUI){
+			slots = type.getDefaultSize();
+		}
+		for (int slot = 0; slot < slots; slot++) {
+			this.guiClickActions.get(clickInventory).putIfAbsent(slot, new HashMap<>());
+			for (ClickType type : List.of(ClickType.LEFT, ClickType.RIGHT, ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT)) {
+				this.guiClickActions.get(clickInventory).get(slot).put(type, clickAction);
+			}
+		}
+		return this;
+	}
 	/**
 	 * Converts this builder to an inventory pattern builder
 	 * @return builder
@@ -287,23 +330,39 @@ public class InventoryGUIBuilder implements Cloneable {
 	public InventoryGUIPatternBuilder patternBuilder(){
 		return new InventoryGUIPatternBuilder(this);
 	}
+	/**
+	 * Converts this builder to an inventory pattern builder
+	 * @return builder
+	 */
+	public InventoryGUIPatternBuilder paginatedBuilder(){
+		return new InventoryGUIPatternBuilder(this);
+	}
 
 	public InventoryGUI build(){
+		Map<Integer, Map<ClickType, GlobalGUIClickAction>> clickActions = guiClickActions.get(ClickInventory.GUI);
+		Map<Integer, Map<ClickType, GlobalGUIClickAction>> playerClickActions = guiClickActions.get(ClickInventory.PLAYER);
+		if (clickActions == null){
+			clickActions = new HashMap<>();
+		}
+		if (playerClickActions == null){
+			playerClickActions = new HashMap<>();
+		}
+
 		try {
 			if (messenger == null && throwExceptionIfMessengerNull) {
 				throw new RuntimeException("Messenger was null while trying to package builder to InventoryGUI");
 			}
 			if (this.type == InventoryType.CHEST) {
 				if (titleTranslation != null) {
-					return new InventoryGUI(titleTranslation, placeholderGenerator, messenger, InventoryType.CHEST, rows.getSlots(), background, clickables, closeConsumer, openConsumer, regenerateItems, generationExceptionPlayerHandler);
+					return new InventoryGUI(titleTranslation, placeholderGenerator, messenger, InventoryType.CHEST, rows.getSlots(), background, clickables, closeConsumer, openConsumer, regenerateItems, clickActions, playerClickActions, generationExceptionPlayerHandler);
 				} else {
-					return new InventoryGUI(name, InventoryType.CHEST, rows.getSlots(), background, clickables, closeConsumer, openConsumer, regenerateItems, messenger, generationExceptionPlayerHandler);
+					return new InventoryGUI(name, InventoryType.CHEST, rows.getSlots(), background, clickables, closeConsumer, openConsumer, regenerateItems, clickActions, playerClickActions, messenger, generationExceptionPlayerHandler);
 				}
 			} else {
 				if (titleTranslation != null) {
-					return new InventoryGUI(titleTranslation, placeholderGenerator, messenger, type, type.getDefaultSize(), background, clickables, closeConsumer, openConsumer, regenerateItems, generationExceptionPlayerHandler);
+					return new InventoryGUI(titleTranslation, placeholderGenerator, messenger, type, type.getDefaultSize(), background, clickables, closeConsumer, openConsumer, regenerateItems, clickActions, playerClickActions, generationExceptionPlayerHandler);
 				} else {
-					return new InventoryGUI(name, type, type.getDefaultSize(), background, clickables, closeConsumer, openConsumer, regenerateItems, messenger, generationExceptionPlayerHandler);
+					return new InventoryGUI(name, type, type.getDefaultSize(), background, clickables, closeConsumer, openConsumer, regenerateItems, clickActions, playerClickActions, messenger, generationExceptionPlayerHandler);
 				}
 			}
 		} catch (Exception e){

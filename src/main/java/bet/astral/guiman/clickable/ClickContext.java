@@ -21,6 +21,10 @@ public final class ClickContext {
 	private final Player who;
 	private final Clickable clickable;
 	private final MessengerInfo messengerInfo;
+//	@Nullable
+//	private final InventoryClickEvent inventoryClickEvent;
+//	@Nullable
+//	private final InventoryDragEvent inventoryDragEvent;
 
 	@Getter
 	@RequiredArgsConstructor

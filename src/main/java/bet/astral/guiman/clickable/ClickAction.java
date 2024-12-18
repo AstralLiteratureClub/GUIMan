@@ -7,8 +7,10 @@ import org.jetbrains.annotations.NotNull;
 @FunctionalInterface
 public interface ClickAction {
 	static ClickAction message(MessageSender messageSender, TranslationKey translationKey){
-		return clickContext -> messageSender.message(clickContext.getWho(), translationKey);
+		return clickContext -> {
+			messageSender.message(clickContext.getWho(), translationKey);
+		};
 	}
 
-	void run(@NotNull ClickContext clickContext);
+    void run(@NotNull ClickContext clickContext);
 }

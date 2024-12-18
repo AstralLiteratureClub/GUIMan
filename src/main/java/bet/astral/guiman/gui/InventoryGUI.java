@@ -4,7 +4,6 @@ import bet.astral.guiman.GUIMan;
 import bet.astral.guiman.background.Background;
 import bet.astral.guiman.clickable.Clickable;
 import bet.astral.guiman.clickable.ClickableLike;
-import bet.astral.guiman.clickable.ClickableProvider;
 import bet.astral.guiman.gui.builders.InventoryGUIBuilder;
 import bet.astral.guiman.gui.builders.InventoryGUIPatternBuilder;
 import bet.astral.guiman.internals.InteractableGUI;
@@ -17,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -61,6 +61,10 @@ public class InventoryGUI  {
 	private final Consumer<Player> closeConsumer;
 	private final Consumer<Player> openConsumer;
 	private final boolean regenerateItems;
+	@NotNull
+	private final Map<Integer, Map<ClickType, GlobalGUIClickAction>> guiClickActions;
+	@NotNull
+	private final Map<Integer, Map<ClickType, GlobalGUIClickAction>> playerClickActions;
 
 	@Nullable
 	private final Messenger messenger;
@@ -127,7 +131,7 @@ public class InventoryGUI  {
 	 * @param generationExceptionPlayerHandler exception handler when trying to generate inventory for a player
 	 */
 	@ApiStatus.Internal
-	public InventoryGUI(@Nullable Component name, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, @Nullable Messenger messenger, Consumer<Player> generationExceptionPlayerHandler) {
+	public InventoryGUI(@Nullable Component name, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> guiClickActions, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> playerClickActions, @Nullable Messenger messenger, Consumer<Player> generationExceptionPlayerHandler) {
 		this.name = name;
 		this.closeConsumer = closeConsumer;
 		this.openConsumer = openConsumer;
@@ -136,7 +140,9 @@ public class InventoryGUI  {
 		this.slots = slots;
 		this.background = background;
 		this.clickables = clickable;
-		this.messenger = messenger;
+        this.guiClickActions = guiClickActions;
+        this.playerClickActions = playerClickActions;
+        this.messenger = messenger;
 		this.generationExceptionPlayerHandler = generationExceptionPlayerHandler;
 		this.nameTranslation = null;
 		this.placeholderGenerator = p->new PlaceholderList();
@@ -159,7 +165,7 @@ public class InventoryGUI  {
 	 * @param generationExceptionPlayerHandler exception handler when trying to generate inventory for a player
 	 */
 	@ApiStatus.Internal
-	public InventoryGUI(@NotNull TranslationKey nameTranslation, @Nullable Function<Player, PlaceholderCollection> placeholderGenerator, @NotNull Messenger messenger, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, Consumer<Player> generationExceptionPlayerHandler) {
+	public InventoryGUI(@NotNull TranslationKey nameTranslation, @Nullable Function<Player, PlaceholderCollection> placeholderGenerator, @NotNull Messenger messenger, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> guiClickActions, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> playerClickActions, Consumer<Player> generationExceptionPlayerHandler) {
 		this.name = Component.translatable(nameTranslation);
 		this.nameTranslation = nameTranslation;
 		this.placeholderGenerator = placeholderGenerator != null ? placeholderGenerator : p -> new PlaceholderList();
@@ -171,7 +177,9 @@ public class InventoryGUI  {
 		this.closeConsumer = closeConsumer;
 		this.openConsumer = openConsumer;
 		this.regenerateItems = regenerateItems;
-		this.generationExceptionPlayerHandler = generationExceptionPlayerHandler;
+        this.guiClickActions = guiClickActions;
+        this.playerClickActions = playerClickActions;
+        this.generationExceptionPlayerHandler = generationExceptionPlayerHandler;
 		this.useMessenger = true;
 		ids.put(Clickable.EMPTY.getId(), Clickable.EMPTY);
 	}

@@ -48,12 +48,12 @@ public class StaticBackground extends Background{
 
 	@Override
 	public @NotNull Optional<@Nullable ClickableLike> getSlot(int slot) {
-		return Optional.of(getEmpty());
+		return Optional.of(getEmptySlot());
 	}
 
 	@Override
 	public @NotNull ClickableLike getSlotOrEmpty(int slot) {
-		return getEmpty();
+		return getEmptySlot();
 	}
 
 	@Override
