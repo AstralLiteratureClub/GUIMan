@@ -113,7 +113,7 @@ public class InventoryClickListener implements Listener {
 			return true;
 		}
 		if (player == null){
-			return true;
+			return false;
 		}
 		return permission.hasPermission(player, gui);
 	}

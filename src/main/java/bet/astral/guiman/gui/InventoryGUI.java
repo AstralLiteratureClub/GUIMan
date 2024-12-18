@@ -208,27 +208,17 @@ public class InventoryGUI  {
 				GUIMan guiMan = GUIMan.GUIMAN;
 				this.getPlayers().putIfAbsent(player, new InteractableGUI(this, player));
 				InteractableGUI gui = players.get(player);
-				guiMan.getPlugin().getSLF4JLogger().error("11");
 				if (gui == null) {
-					guiMan.getPlugin().getSLF4JLogger().error("12");
 					gui = new InteractableGUI(this, player);
-					guiMan.getPlugin().getSLF4JLogger().error("13");
 					gui.generate(player, messenger);
-					guiMan.getPlugin().getSLF4JLogger().error("14");
 				} else if (regenerateItems) {
-					guiMan.getPlugin().getSLF4JLogger().error("15");
 					gui.generate(player, messenger);
-					guiMan.getPlugin().getSLF4JLogger().error("16");
 				}
 
-				guiMan.getPlugin().getSLF4JLogger().error("17");
 				final InteractableGUI interactableGUI = gui;
 				player.getScheduler().run(GUIMan.GUIMAN.getPlugin(), t ->{
-					guiMan.getPlugin().getSLF4JLogger().error("19");
 					player.openInventory(interactableGUI.getInventory());
-					guiMan.getPlugin().getSLF4JLogger().error("20");
 				} , null);
-				guiMan.getPlugin().getSLF4JLogger().error("18");
 			} catch (Exception e){
 				GUIMan.GUIMAN.getPlugin().getSLF4JLogger().error("Error while trying to open GUI to {}", player.getName(), e);
 			}

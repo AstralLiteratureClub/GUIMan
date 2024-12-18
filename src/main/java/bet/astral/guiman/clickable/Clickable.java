@@ -8,7 +8,6 @@ import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.receiver.Receiver;
 import bet.astral.messenger.v2.translation.TranslationKey;
-import bet.astral.more4j.function.consumer.TriConsumer;
 import de.cubbossa.translations.ComponentSplit;
 import lombok.AccessLevel;
 import lombok.Getter;
