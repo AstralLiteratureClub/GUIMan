@@ -23,7 +23,7 @@ repositories {
 var serverVersion = "1.21.3"
 
 dependencies {
-    compileOnly("bet.astral:messenger:2.3.0")
+    compileOnly("bet.astral:messenger:2.3.2")
     compileOnly("bet.astral:more4j:1.0.2")
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
@@ -33,7 +33,7 @@ dependencies {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(22))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 publishing {
