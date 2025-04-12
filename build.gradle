@@ -8,7 +8,6 @@ group = 'bet.astral'
 version = '1.2.1'
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven {
         name = "papermc-repo"
@@ -18,13 +17,15 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven { url 'https://jitpack.io' }
+
 }
 
 var serverVersion = "1.21.3"
 
 dependencies {
-    compileOnly("bet.astral:messenger:2.3.2")
-    compileOnly("bet.astral:more4j:1.0.2")
+    implementation 'com.github.AstralLiteratureClub:MoreForJava:-SNAPSHOT'
+    implementation 'com.github.AstralLiteratureClub:MessageManager:-SNAPSHOT'
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
