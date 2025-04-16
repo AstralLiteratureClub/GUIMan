@@ -266,12 +266,12 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 		if (itemName != null){
 			meta.displayName(messenger
 					.disablePrefixForNextParse()
-					.parseComponent(new MessageInfoBuilder(itemName).withPlaceholders(placeholders).create(), ComponentType.CHAT, receiver));
+					.parseComponent(new MessageInfoBuilder(itemName).withPlaceholders(placeholders).build(), ComponentType.CHAT, receiver));
 		} else if (itemLore != null){
 			Component component = messenger
 					.disablePrefixForNextParse()
 					.parseComponent(new MessageInfoBuilder(itemLore)
-							.withPlaceholders(placeholders).create(), ComponentType.CHAT, receiver);
+							.withPlaceholders(placeholders).build(), ComponentType.CHAT, receiver);
 			if (component != null){
 				meta.lore(ComponentSplit.split(component, "\n"));
 			}
