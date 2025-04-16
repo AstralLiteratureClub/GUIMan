@@ -81,7 +81,7 @@ public class InteractableGUI implements InventoryHolder {
 				// Parse the gui name
 				name = gui.getMessenger()
 						.disablePrefixForNextParse()
-						.parseComponent(messageInfo.create(), ComponentType.CHAT, receiver);
+						.parseComponent(messageInfo.build(), ComponentType.CHAT, receiver);
 				inventory = createFunction.apply(this, obj, name);
 			} else {
 				name = gui.getName();
