@@ -12,8 +12,6 @@ public enum SignMaterial {
 	JUNGLE(Material.JUNGLE_SIGN, Material.JUNGLE_HANGING_SIGN),
 	MANGROVE(Material.MANGROVE_SIGN, Material.MANGROVE_HANGING_SIGN),
 	CHERRY(Material.CHERRY_SIGN, Material.CHERRY_HANGING_SIGN),
-	@ApiStatus.Experimental
-	@MinecraftExperimental(MinecraftExperimental.Requires.WINTER_DROP)
 	PALE_OAK(Material.PALE_OAK_SIGN, Material.PALE_OAK_HANGING_SIGN),
 	BAMBOO(Material.BAMBOO_SIGN, Material.BAMBOO_HANGING_SIGN),
 	CRIMSON(Material.CRIMSON_SIGN, Material.CRIMSON_HANGING_SIGN),
