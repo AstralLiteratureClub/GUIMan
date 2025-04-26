@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'bet.astral'
-version = '1.2.2'
+version = '1.2.3'
 
 repositories {
     mavenCentral()
@@ -33,15 +33,25 @@ dependencies {
     paperweight.paperDevBundle(serverVersion + "-R0.1-SNAPSHOT")
 }
 
+
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 publishing {
     publications {
-        //noinspection GroovyAssignabilityCheck
-        maven(MavenPublication) {
-            from(components.java)
+        mavenJava(MavenPublication) {
+            artifactId project.name
+            from components.java
         }
     }
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
 }
