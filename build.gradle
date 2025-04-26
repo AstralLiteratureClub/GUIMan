@@ -33,8 +33,13 @@ dependencies {
     paperweight.paperDevBundle(serverVersion + "-R0.1-SNAPSHOT")
 }
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
 publishing {
     publications {
+        //noinspection GroovyAssignabilityCheck
         maven(MavenPublication) {
             from(components.java)
         }
