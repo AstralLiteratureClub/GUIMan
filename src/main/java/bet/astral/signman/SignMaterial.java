@@ -1,8 +1,6 @@
 package bet.astral.signman;
 
 import org.bukkit.Material;
-import org.bukkit.MinecraftExperimental;
-import org.jetbrains.annotations.ApiStatus;
 
 public enum SignMaterial {
 	OAK(Material.OAK_SIGN, Material.OAK_HANGING_SIGN),
