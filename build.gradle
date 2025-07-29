@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.16"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.17"
 }
 
 group = 'bet.astral'
@@ -21,11 +21,11 @@ repositories {
 
 }
 
-var serverVersion = "1.21.4"
+var serverVersion = "1.21.8"
 
 dependencies {
-    implementation 'com.github.AstralLiteratureClub:MoreForJava:-SNAPSHOT'
-    implementation 'com.github.AstralLiteratureClub:MessageManager:-SNAPSHOT'
+    implementation 'com.github.AstralLiteratureClub:MoreForJava:1.0.2'
+    implementation 'com.github.AstralLiteratureClub:MessageManager:2.4.0'
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
