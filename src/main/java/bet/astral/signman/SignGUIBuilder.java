@@ -6,12 +6,15 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Consumer;
 
 public class SignGUIBuilder {
+	private static final Random random = new SecureRandom();
 	private SignMaterial material = SignMaterial.OAK;
 	private SignSize signSize = SignSize.NORMAL;
 	private Map<Integer, Component> lines = new HashMap<>(4);
@@ -30,6 +33,16 @@ public class SignGUIBuilder {
 
 	public SignGUIBuilder setMaterial(SignMaterial material) {
 		this.material = material;
+		return this;
+	}
+
+	/**
+	 * Sets the sign material to a random sign material out of all materials
+	 * @param signMaterial sign material
+	 * @return this
+	 */
+	public SignGUIBuilder setRandomMaterial(SignMaterial signMaterial) {
+		this.material = SignMaterial.values()[random.nextInt(SignMaterial.values().length)];
 		return this;
 	}
 
