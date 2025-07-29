@@ -1,5 +1,11 @@
 package bet.astral.signman.wrapped;
 
+import bet.astral.messenger.v2.Messenger;
+import bet.astral.messenger.v2.component.ComponentType;
+import bet.astral.messenger.v2.info.MessageInfoBuilder;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
+import bet.astral.messenger.v2.translation.TranslationKey;
 import bet.astral.signman.SignGUI;
 import bet.astral.signman.SignResult;
 import io.netty.channel.Channel;
@@ -19,7 +25,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PacketInjector {
 	private final JavaPlugin plugin;
@@ -62,6 +70,29 @@ public class PacketInjector {
 		handle(player, gui);
 	}
 
+	private List<Component> handleMessengerTranslations(Player player, SignGUI gui) {
+		Map<Integer, Component> lines = new HashMap<>();
+		if (gui.getMessenger() == null){
+			return gui.getLines();
+		}
+		Messenger messenger = gui.getMessenger();
+		PlaceholderCollection collection = gui.getPlaceholderGenerator() != null ? gui.getPlaceholderGenerator().apply(player) : new PlaceholderList();
+		for (int i = 0; i < 3; i++){
+			lines.put(i, gui.getLines().get(i));
+			TranslationKey key = gui.getTranslationKeyLines().get(i);
+			if (key == null) continue;
+			Component component = messenger.parseComponent(new MessageInfoBuilder(key)
+					.withReceiver(player)
+					.withPlaceholders(collection).build(), ComponentType.CHAT);
+
+			if (component == null) continue;
+
+			lines.put(i, component);
+		}
+
+		return lines.values().stream().toList();
+	}
+
 	private void handle(Player player, SignGUI gui){
 		Location location = player.getLocation().add(0, -2, 0);
 		if (location.getY()<location.getWorld().getMinHeight()){
@@ -80,7 +111,7 @@ public class PacketInjector {
 		SignSide side = sign.getSide(Side.FRONT);
 		side.setColor(gui.getColor());
 		int i = 0;
-		for (Component component : gui.getLines()){
+		for (Component component : handleMessengerTranslations(player, gui)){
 			if (i>3){
 				break;
 			}

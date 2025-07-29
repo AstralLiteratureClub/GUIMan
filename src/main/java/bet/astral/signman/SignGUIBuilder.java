@@ -1,5 +1,8 @@
 package bet.astral.signman;
 
+import bet.astral.messenger.v2.Messenger;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
+import bet.astral.messenger.v2.translation.TranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -12,16 +15,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class SignGUIBuilder {
 	private static final Random random = new SecureRandom();
 	private SignMaterial material = SignMaterial.OAK;
 	private SignSize signSize = SignSize.NORMAL;
 	private Map<Integer, Component> lines = new HashMap<>(4);
+	private Map<Integer, TranslationKey> translationLines = new HashMap<>(4);
 	private DyeColor color = DyeColor.BLACK;
 	private SignHandler handler;
 	private final ComponentSerializer<? extends Component, ? extends Component, String> componentSerializer;
 	private Consumer<Player> openConsumer = null;
+
+	private Messenger messenger = null;
+	private Function<Player, PlaceholderCollection> placeholderGenerator = null;
 
 	public SignGUIBuilder(ComponentSerializer<? extends Component, ? extends Component, String> componentSerializer) {
 		this.componentSerializer = componentSerializer;
@@ -51,6 +59,26 @@ public class SignGUIBuilder {
 		return this;
 	}
 
+	/**
+	 * Sets the messenger used, when generating this sign and translating lines
+	 * @param messenger messenger
+	 * @return translator
+	 */
+	public SignGUIBuilder setMessenger(Messenger messenger) {
+		this.messenger = messenger;
+		return this;
+	}
+
+	/**
+	 * Sets the placeholder generator used, when trying to generate the sign with messenger
+	 * @param placeholderGenerator placeholder generator
+	 * @return this
+	 */
+	public SignGUIBuilder setPlaceholderGenerator(Function<Player, PlaceholderCollection> placeholderGenerator) {
+		this.placeholderGenerator = placeholderGenerator;
+		return this;
+	}
+
 	public SignGUIBuilder setLinesStr(List<String> lines) {
 		int i = 0;
 		for (String line : lines){
@@ -65,6 +93,31 @@ public class SignGUIBuilder {
 			this.lines.put(i, componentSerializer.deserialize(line));
 			i++;
 		}
+		return this;
+	}
+
+	/**
+	 * Sets the given lines to the given translations which are translated by the messenger
+	 * @param lines lines
+	 * @return this
+	 */
+	public SignGUIBuilder setLines(TranslationKey... lines) {
+		int i = 0;
+		for (TranslationKey line : lines){
+			this.translationLines.put(i, line);
+			i++;
+		}
+		return this;
+	}
+
+	/**
+	 * Sets the `line` to the given translation which is translated using the provided messenger
+	 * @param line line
+	 * @param translationKey translation key
+	 * @return this
+	 */
+	public SignGUIBuilder setLine(int line, TranslationKey translationKey) {
+		this.translationLines.put(line, translationKey);
 		return this;
 	}
 
@@ -110,6 +163,6 @@ public class SignGUIBuilder {
 	}
 
 	public SignGUI build() {
-		return new SignGUI(material, signSize, lines.values().stream().toList(), color, handler, componentSerializer, openConsumer);
+		return new SignGUI(material, signSize, lines.values().stream().toList(), translationLines.values().stream().toList(), color, handler, componentSerializer, openConsumer, messenger, placeholderGenerator);
 	}
 }
