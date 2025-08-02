@@ -78,16 +78,22 @@ public class PacketInjector {
 		Messenger messenger = gui.getMessenger();
 		PlaceholderCollection collection = gui.getPlaceholderGenerator() != null ? gui.getPlaceholderGenerator().apply(player) : new PlaceholderList();
 		for (int i = 0; i < 3; i++){
-			lines.put(i, gui.getLines().get(i));
-			TranslationKey key = gui.getTranslationKeyLines().get(i);
-			if (key == null) continue;
-			Component component = messenger.parseComponent(new MessageInfoBuilder(key)
-					.withReceiver(player)
-					.withPlaceholders(collection).build(), ComponentType.CHAT);
+			if (!gui.getLines().isEmpty() && gui.getLines().get(i) != null){
+				lines.put(i, gui.getLines().get(i));
+			} else {
+				lines.put(i, Component.empty());
+			}
+			if (!gui.getTranslationKeyLines().isEmpty() && gui.getTranslationKeyLines().get(i) != null) {
+				TranslationKey key = gui.getTranslationKeyLines().get(i);
+				if (key == null) continue;
+				Component component = messenger.parseComponent(new MessageInfoBuilder(key)
+						.withReceiver(player)
+						.withPlaceholders(collection).build(), ComponentType.CHAT);
 
-			if (component == null) continue;
+				if (component == null) continue;
 
-			lines.put(i, component);
+				lines.put(i, component);
+			}
 		}
 
 		return lines.values().stream().toList();
