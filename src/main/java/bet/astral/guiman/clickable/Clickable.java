@@ -267,7 +267,8 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 			meta.displayName(messenger
 					.disablePrefixForNextParse()
 					.parseComponent(new MessageInfoBuilder(itemName).withPlaceholders(placeholders).build(), ComponentType.CHAT, receiver));
-		} else if (itemLore != null){
+		}
+		if (itemLore != null){
 			Component component = messenger
 					.disablePrefixForNextParse()
 					.parseComponent(new MessageInfoBuilder(itemLore)
