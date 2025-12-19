@@ -25,9 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PacketInjector {
 	private final JavaPlugin plugin;
@@ -38,14 +36,6 @@ public class PacketInjector {
 		this.plugin = plugin;
 		this.async = async;
 		key = new NamespacedKey(plugin, "sign_packet_handler");
-	}
-
-	public JavaPlugin getPlugin() {
-		return null;
-	}
-
-	public boolean async() {
-		return false;
 	}
 
 	public void addInjector(Player player) {
@@ -70,34 +60,49 @@ public class PacketInjector {
 		handle(player, gui);
 	}
 
-	private List<Component> handleMessengerTranslations(Player player, SignGUI gui) {
-		Map<Integer, Component> lines = new HashMap<>();
-		if (gui.getMessenger() == null){
-			return gui.getLines();
-		}
-		Messenger messenger = gui.getMessenger();
-		PlaceholderCollection collection = gui.getPlaceholderGenerator() != null ? gui.getPlaceholderGenerator().apply(player) : new PlaceholderList();
-		for (int i = 0; i < 3; i++){
-			if (!gui.getLines().isEmpty() && gui.getLines().get(i) != null){
-				lines.put(i, gui.getLines().get(i));
-			} else {
-				lines.put(i, Component.empty());
-			}
-			if (!gui.getTranslationKeyLines().isEmpty() && gui.getTranslationKeyLines().get(i) != null) {
-				TranslationKey key = gui.getTranslationKeyLines().get(i);
-				if (key == null) continue;
-				Component component = messenger.parseComponent(new MessageInfoBuilder(key)
-						.withReceiver(player)
-						.withPlaceholders(collection).build(), ComponentType.CHAT);
+    private List<Component> handleMessengerTranslations(Player player, SignGUI gui) {
+        if (gui.getMessenger() == null) {
+            return gui.getLines();
+        }
 
-				if (component == null) continue;
+        Messenger messenger = gui.getMessenger();
+        PlaceholderCollection placeholders =
+                gui.getPlaceholderGenerator() != null
+                        ? gui.getPlaceholderGenerator().apply(player)
+                        : new PlaceholderList();
 
-				lines.put(i, component);
-			}
-		}
+        List<Component> result = new ArrayList<>(4);
+        List<Component> baseLines = gui.getLines();
+        List<TranslationKey> translationLines = gui.getTranslationKeyLines();
 
-		return lines.values().stream().toList();
-	}
+        for (int i = 0; i < 4; i++) {
+            Component line = i < baseLines.size() && baseLines.get(i) != null
+                    ? baseLines.get(i)
+                    : Component.empty();
+
+            if (i < translationLines.size()) {
+                TranslationKey key = translationLines.get(i);
+                if (key != null) {
+                    Component translated = messenger.parseComponent(
+                            new MessageInfoBuilder(key)
+                                    .withReceiver(player)
+                                    .withPlaceholders(placeholders)
+                                    .build(),
+                            ComponentType.CHAT
+                    );
+
+                    if (translated != null) {
+                        line = translated;
+                    }
+                }
+            }
+
+            result.add(line);
+        }
+
+        return result;
+    }
+
 
 	private void handle(Player player, SignGUI gui){
 		Location location = player.getLocation().add(0, -2, 0);
