@@ -7,6 +7,8 @@ import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import bet.astral.more4j.function.consumer.TriConsumer;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -96,7 +98,7 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 */
 	@NotNull
 	public ClickableBuilder hideItemFlags(){
-		itemStack.editMeta(meta->meta.addItemFlags(ItemFlag.values()));
+		itemStack.addItemFlags(ItemFlag.values());
 		return this;
 	}
 
@@ -106,7 +108,29 @@ public class ClickableBuilder implements Cloneable, ClickableLike {
 	 */
 	@NotNull
 	public ClickableBuilder hideTooltip(){
-		itemStack.editMeta(meta->meta.setHideTooltip(true));
+		itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hideTooltip(true));
+		return this;
+	}
+
+	/**
+	 * Makes the item unbreakable and hides the unbreakable flag
+	 * @return this
+	 */
+	@NotNull
+	public ClickableBuilder hideDurability() {
+		itemStack.setData(DataComponentTypes.UNBREAKABLE);
+		itemStack.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+		return this;
+	}
+
+	/**
+	 * Modifies the itemstack of the clickable to the new item from the modification function
+	 * @param itemFunc function to modify item
+	 * @return this
+	 */
+	@NotNull
+	public ClickableBuilder modifyItem(Function<ItemStack, ItemStack> itemFunc){
+		this.itemStack = itemFunc.apply(this.itemStack);
 		return this;
 	}
 
