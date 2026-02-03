@@ -1,11 +1,3 @@
-# GUIMan & SignMan
-GUIMan is a inventory GUI creation library. GUIMan handles all click actions and makes coding GUIs easier. 
-
-## SignMan
-SignMan is a packet based sign library. When a user signs a sign the server receives player sign packet. Using this packet it is possible to run custom your custom handler
-
-Running custom sign for a player
-```java
 import bet.astral.guiman.api.sign.api.Sign;
 import bet.astral.guiman.api.sign.api.SignAction;
 import bet.astral.guiman.api.sign.api.material.SignMaterial;
@@ -54,38 +46,7 @@ public class Test {
 						).build())
 				)
 			).build();
-		
+
 		sign.open(player);
 	}
 }
-```
-
-## Gradle
-
-```groovy
-repositories {
-	maven("https://jitpack.io")
-}
-
-dependencies {
-	implementation("com.github.AstralLiteratureClub:MoreForJava:1.0.2") // Dependency of messenger
-	implementation("com.github.AstralLiteratureClub:MessageManager:2.4.1") // Messenger to manage messages
-	
-	// I am making messenger optional later hopefully so it is not even required in the project
-	implementation("com.github.AstralLiteratureClub:GUIMan:1.3.1-6") // GUIMan
-}
-```
-
-
-
-## Minecraft Support
-
-
-| Version        | GUIMan | SignMan |
-|----------------|--------|---------|
-| 1.21–1.21.11   | ✅     | ✅      |
-| 1.20.5–1.20.6  | ✅     | ✅      |
-| 1.20–1.20.4    | ✅     | ❌      |
-| 1.19–1.19.4    | ✅     | ❌      |
-| 1.18–1.18.2    | ✅     | ❌      |
-| 1.17–1.17.1    | ✅     | ❌      |

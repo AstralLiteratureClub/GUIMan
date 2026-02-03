@@ -5,6 +5,7 @@ import bet.astral.signman.SignMan;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
@@ -20,7 +21,8 @@ public interface SignAction {
 	 * @param gui gui
 	 * @return new action
 	 */
-	default SignAction openInventory(InventoryGUI gui) {
+	@Contract(pure = true)
+	static @NotNull SignAction openInventory(InventoryGUI gui) {
 		return (player, lines) -> gui.open(player);
 	}
 
@@ -29,7 +31,8 @@ public interface SignAction {
 	 * @param inventory inventory to open
 	 * @return new action
 	 */
-	default SignAction openInventory(Inventory inventory) {
+	@Contract(pure = true)
+	static @NotNull SignAction openInventory(Inventory inventory) {
 		return (player, lines) -> Bukkit.getScheduler().runTask(SignMan.getPlugin(), t->player.openInventory(inventory));
 	}
 
@@ -38,7 +41,8 @@ public interface SignAction {
 	 * @param gui gui
 	 * @return new action
 	 */
-	default SignAction openSign(Sign gui) {
+	@Contract(pure = true)
+	static @NotNull SignAction openSign(Sign gui) {
 		return (player, lines) -> gui.open(player);
 	}
 
@@ -47,7 +51,8 @@ public interface SignAction {
 	 * @param function function
 	 * @return new action
 	 */
-	default SignAction run(@NotNull BiFunction<Player, SignResult, ?> function){
+	@Contract(pure = true)
+	static @NotNull SignAction run(@NotNull BiFunction<Player, SignResult, ?> function){
 		return (function::apply);
 	}
 
@@ -56,7 +61,8 @@ public interface SignAction {
 	 * @param consumer consumer
 	 * @return new action
 	 */
-	default SignAction run(@NotNull BiConsumer<Player, SignResult> consumer){
+	@Contract(pure = true)
+	static @NotNull SignAction run(@NotNull BiConsumer<Player, SignResult> consumer){
 		return (consumer::accept);
 	}
 

@@ -2,6 +2,7 @@ package bet.astral.guiman.api.sign.api;
 
 import bet.astral.guiman.api.inventory.annotations.MinecraftVersion;
 import bet.astral.guiman.api.inventory.annotations.UseMessenger;
+import bet.astral.guiman.api.sign.api.builder.SignBuilder;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.translation.TranslationKey;
@@ -11,6 +12,8 @@ import net.kyori.adventure.text.serializer.ComponentSerializer;
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -20,7 +23,12 @@ import java.util.function.Function;
  * Sign is a ram cached representation of a sign gui. This is never in the real world of the server. The signs are ran in packet level
  */
 public interface Sign {
-    /**
+	@Contract(pure = true)
+	static @Nullable SignBuilder builder() {
+		return null;
+	}
+
+	/**
      * Returns the material used for this sign
      * @return material
      */
