@@ -12,6 +12,27 @@ plugins {
 
 java.disableAutoTargetJvm() // Allow consuming JVM 21 projects (i.e. paper_1_21_8) even though our release is 17
 
+subprojects {
+	apply(plugin = "java-library")
+	apply(plugin = "maven-publish")
+
+	repositories {
+		mavenCentral()
+		maven("https://jitpack.io")
+	}
+
+	dependencies {
+		// Jet brains annotations
+		compileOnly("org.jetbrains:annotations:24.1.0")
+
+		// MESSENGER
+		compileOnly("com.github.AstralLiteratureClub:MessageManager:2.4.1")
+		compileOnly("com.github.AstralLiteratureClub:MoreForJava:1.0.2")
+
+	//		compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+	}
+}
+
 repositories {
 	maven("https://jitpack.io")
 }
@@ -19,13 +40,14 @@ repositories {
 dependencies {
 	compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
 
-	implementation("com.github.AstralLiteratureClub:MoreForJava:1.0.2")
-	implementation("com.github.AstralLiteratureClub:MessageManager:2.4.1")
-	implementation("com.github.AstralLiteratureClub:CloudPlusPlus:1.3.0")
+	compileOnly("com.github.AstralLiteratureClub:MoreForJava:1.0.2")
+	compileOnly("com.github.AstralLiteratureClub:MessageManager:2.4.1")
+	compileOnly("com.github.AstralLiteratureClub:CloudPlusPlus:1.3.0")
 
 	compileOnly("org.projectlombok:lombok:1.18.32")
 	annotationProcessor("org.projectlombok:lombok:1.18.32")
 
+	implementation(project(":api"))
 	implementation(project(":core"))
 
 	// Shade the reobf variant

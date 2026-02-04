@@ -1,9 +1,10 @@
 package bet.astral.guiman;
 
-import bet.astral.guiman.clickable.Clickable;
-import bet.astral.guiman.gui.InventoryGUI;
-import bet.astral.guiman.utils.ChestRows;
-import bet.astral.signman.SignGUIBuilder;
+import bet.astral.guiman.core.GUIManInitializer;
+import bet.astral.guiman.core.inventory.clickable.Clickable;
+import bet.astral.guiman.core.inventory.gui.InventoryGUI;
+import bet.astral.guiman.api.inventory.ChestRows;
+import bet.astral.guiman.core.sign.SignGUIBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.DyeColor;
@@ -19,7 +20,7 @@ import java.util.List;
 public class Plugin extends JavaPlugin {
     @Override
     public void onEnable() {
-        GUIMan.init(this);
+        GUIManInitializer.init(this);
 
         getServer().getCommandMap()
                 .register(

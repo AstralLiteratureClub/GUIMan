@@ -1,6 +1,6 @@
 package bet.astral.guiman.api.sign.api.material;
 
-import bet.astral.guiman.api.inventory.annotations.MinecraftVersion;
+import bet.astral.guiman.api.annotations.MinecraftVersion;
 import org.bukkit.Material;
 
 /**

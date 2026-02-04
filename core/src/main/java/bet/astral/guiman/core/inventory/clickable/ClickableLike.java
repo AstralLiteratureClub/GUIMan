@@ -1,0 +1,23 @@
+package bet.astral.guiman.core.inventory.clickable;
+
+import bet.astral.messenger.v2.Messenger;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+/**
+ * Clickable like which only generates item stack for GUI
+ */
+public interface ClickableLike {
+	/**
+	 * Generates item stack for inventories
+	 * @param player player
+	 * @return item
+	 */
+	ItemStack generate(Messenger messenger, Player player);
+
+	/**
+	 * Returns the clickable associated with this clickable
+	 * @return clickable
+	 */
+	Clickable asClickable();
+}

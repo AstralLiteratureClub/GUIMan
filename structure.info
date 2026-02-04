@@ -1,0 +1,33 @@
+ROOT:
+	IMPLEMENT:
+		API
+		CORE
+	RUNTIME_IMPLEMENT:
+		V1_21
+		V1_20_5
+		V1_20
+		V..
+
+	COMPILE_ONLY:
+		MESSENGER ASTRALBET // MAKE OPTIONAL for running and compiling
+		MORE_FOR_JAVA // MAKE OPTIONAL ^^
+		PAPER
+
+CORE:
+	V1_21...V1_20:
+	COMPILE_ONLY:
+		API
+		MESSENGER ASTRALBET // MAKE OPTIONAL for running and compiling
+		MORE_FOR_JAVA // MAKE OPTIONAL ^^
+		PAPER
+
+V1_21...V1_20:
+	COMPILE_ONLY:
+		API
+		MESSENGER ASTRALBET // MAKE OPTIONAL for running and compiling
+		MORE_FOR_JAVA ASTRALBET // MAKE OPTIONAL ^^
+	PAPERWEIGHT-USER-DEV
+
+Make the astral bet libraries optional and available in every module
+Make API available in every module
+

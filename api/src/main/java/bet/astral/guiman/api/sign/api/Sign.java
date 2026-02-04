@@ -1,7 +1,7 @@
 package bet.astral.guiman.api.sign.api;
 
-import bet.astral.guiman.api.inventory.annotations.MinecraftVersion;
-import bet.astral.guiman.api.inventory.annotations.UseMessenger;
+import bet.astral.guiman.api.annotations.MinecraftVersion;
+import bet.astral.guiman.api.annotations.UseMessenger;
 import bet.astral.guiman.api.sign.api.builder.SignBuilder;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;

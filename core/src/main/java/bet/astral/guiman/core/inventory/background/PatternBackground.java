@@ -1,0 +1,56 @@
+package bet.astral.guiman.core.inventory.background;
+
+import bet.astral.guiman.core.inventory.clickable.ClickableLike;
+import bet.astral.guiman.core.inventory.background.builders.PatternBackgroundBuilder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+
+/**
+ * Background implementation with a pattern which can be defined by {@link PatternBackgroundBuilder}
+ */
+public class PatternBackground extends Background{
+	@NotNull
+	private final Map<Character, ClickableLike> clickables;
+	@NotNull
+	private final Map<Integer, Character> slots;
+
+	/**
+	 * Creates a new instance of the pattern background. For easy implementation use {@link PatternBackgroundBuilder}
+	 * @param empty air slot, clickable
+	 * @param clickables char definitions
+	 * @param slots slot definitions
+	 */
+	public PatternBackground(@NotNull ClickableLike empty, @NotNull Map<Character, ClickableLike> clickables, @NotNull Map<Integer, Character> slots) {
+		super(empty);
+		this.clickables = clickables;
+		this.slots = slots;
+	}
+
+	@Override
+	public @NotNull Optional<@Nullable ClickableLike> getSlot(int slot) {
+		return Optional.empty();
+	}
+
+	@Override
+	public @NotNull ClickableLike getSlotOrEmpty(int slot) {
+		Character character = slots.get(slot);
+		ClickableLike clickable = clickables.get(character);
+		return clickable != null ? clickable : getEmptySlot();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return clickables.isEmpty();
+	}
+
+	@Override
+	public @NotNull Iterator<ClickableLike> iterator() {
+		List<ClickableLike> list = new LinkedList<>();
+		for (int i = 0; i < 54; i++){
+			list.add(getSlotOrEmpty(i));
+		}
+		return list.iterator();
+	}
+}
