@@ -21,11 +21,20 @@ public class GUIMan {
 	private final MessengerConfig messengerConfig;
 	private final boolean disableMessengerWarning;
 
-	public GUIMan(JavaPlugin plugin, boolean supportMessenger, MessengerConfig messengerConfig, boolean disableMessengerWarning) {
+	public GUIMan(JavaPlugin plugin, MessengerConfig messengerConfig, boolean disableMessengerWarning) {
 		this.plugin = plugin;
-		this.supportMessenger = supportMessenger;
 		this.messengerConfig = messengerConfig;
 		this.disableMessengerWarning = disableMessengerWarning;
+
+
+		boolean supportMessenger1;
+		try {
+			supportMessenger1 = true;
+			Class.forName("bet.astral.messenger.v2.Messenger");
+		} catch (ClassNotFoundException e) {
+			supportMessenger1 = false;
+		}
+		this.supportMessenger = supportMessenger1;
 	}
 
 	public void initialize() {
@@ -77,6 +86,10 @@ public class GUIMan {
 	}
 
 	public @NotNull InventoryGUIBuilder inventoryBuilder() {
+		return null;
+	}
+
+	public MessengerConfig getMessengerConfig() {
 		return null;
 	}
 }

@@ -2,7 +2,7 @@ package bet.astral.guiman;
 
 import bet.astral.guiman.core.GUIManInitializer;
 import bet.astral.guiman.core.inventory.clickable.Clickable;
-import bet.astral.guiman.core.inventory.gui.InventoryGUI;
+import bet.astral.guiman.core.inventory.gui.InventoryImpl;
 import bet.astral.guiman.api.inventory.ChestRows;
 import bet.astral.guiman.core.sign.SignGUIBuilder;
 import net.kyori.adventure.text.Component;
@@ -28,7 +28,7 @@ public class Plugin extends JavaPlugin {
                         new BukkitCommand("inventory") {
                             @Override
                             public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String @NotNull [] args) {
-                                InventoryGUI.builder(ChestRows.SIX)
+                                InventoryImpl.builder(ChestRows.SIX)
                                         .clickable(15, Clickable.builder(Material.STONE).actionGeneral(context->context.getWho().sendMessage("Hey!")))
                                         .build()
                                         .open((Player) sender);

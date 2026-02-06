@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 /**
  * Clickable context in inventory. Works like a button
  */
-public interface Clickable extends DataLike {
+public interface Clickable extends DataLike, Comparable<Clickable> {
 	/**
 	 * Returns a new clickable builder instance with material as {@link Material#STONE}
 	 * @return new builder
@@ -107,4 +107,6 @@ public interface Clickable extends DataLike {
 	 */
 	@NotNull
 	ItemStack generate(@NotNull Player player);
+
+	int compareTo(@NotNull Clickable clickable);
 }

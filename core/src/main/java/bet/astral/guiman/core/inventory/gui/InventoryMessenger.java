@@ -9,6 +9,7 @@ import bet.astral.messenger.v2.translation.TranslationKey;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -145,6 +146,26 @@ public class InventoryMessenger implements MInventoryGUI {
 
 	@Override
 	public void open(Player player) {
+
+	}
+
+	@Override
+	public void setData(@NotNull String key, Object value) {
+
+	}
+
+	@Override
+	public @Nullable Object getData(String key) {
+		return null;
+	}
+
+	@Override
+	public @NotNull Map<String, Object> getData() {
+		return Map.of();
+	}
+
+	@Override
+	public void clearData() {
 
 	}
 }

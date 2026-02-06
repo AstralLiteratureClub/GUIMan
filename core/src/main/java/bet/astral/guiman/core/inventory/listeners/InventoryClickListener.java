@@ -1,17 +1,11 @@
-package bet.astral.guiman.core.inventory.internals;
+package bet.astral.guiman.core.inventory.listeners;
 
-
-import bet.astral.guiman.core.GUIManInitializer;
-import bet.astral.guiman.core.inventory.gui.GlobalClickActionResult;
-import bet.astral.guiman.core.inventory.gui.GlobalGUIClickAction;
-import bet.astral.guiman.api.inventory.gui.InventoryGUI;
 import bet.astral.guiman.api.inventory.clickable.ClickAction;
-import bet.astral.guiman.core.inventory.clickable.ClickContext;
-import bet.astral.guiman.core.inventory.clickable.Clickable;
-import bet.astral.guiman.core.inventory.permission.Permission;
+import bet.astral.guiman.api.inventory.gui.InventoryGUI;
+import bet.astral.guiman.core.GUIManInitializer;
+import bet.astral.guiman.core.inventory.gui.PlayerInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -21,18 +15,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-/**
- *
- */
-@Deprecated(forRemoval = true)
 @ApiStatus.Internal
-public class InventoryClickListener implements Listener {
+public final class InventoryClickListener {
 	@EventHandler
 	private void onClick(InventoryClickEvent event){
 		if (!(event.getWhoClicked() instanceof Player player)){
 			return;
 		}
-		if (event.getInventory().getHolder() instanceof InteractableGUI interactableGUI){
+		if (event.getInventory().getHolder() instanceof PlayerInventory interactableGUI){
 			InventoryGUI gui = interactableGUI.getGUI();
 			event.setCancelled(true);
 
@@ -64,7 +54,7 @@ public class InventoryClickListener implements Listener {
 				return;
 			}
 			ClickContext context = new ClickContext(gui, event.getInventory(), itemStack, event.getClick(), player, clickable,
-					new ClickContext.MessengerInfo(gui.getMessenger(), gui.getMessenger() != null ? gui.getMessenger().convertReceiver(player) : null, gui.getMessenger() != null));
+				new ClickContext.MessengerInfo(gui.getMessenger(), gui.getMessenger() != null ? gui.getMessenger().convertReceiver(player) : null, gui.getMessenger() != null));
 			if (clickable.isAsync()){
 				CompletableFuture.runAsync(()->{
 					try {
@@ -118,5 +108,4 @@ public class InventoryClickListener implements Listener {
 		}
 		return permission.hasPermission(player, gui);
 	}
-
 }

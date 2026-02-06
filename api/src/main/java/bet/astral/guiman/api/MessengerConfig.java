@@ -14,4 +14,12 @@ public class MessengerConfig {
 		this.messenger = messenger;
 		this.globalPlaceholderGenerator = globalPlaceholderGenerator;
 	}
+
+	public Messenger getMessenger() {
+		return messenger;
+	}
+
+	public PlaceholderGenerator getPlaceholderGenerator() {
+		return globalPlaceholderGenerator;
+	}
 }

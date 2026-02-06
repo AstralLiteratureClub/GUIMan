@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -124,7 +125,7 @@ public interface InventoryGUI extends DataLike {
 	 * Returns the action ran, when an exception occurs in this inventory
 	 * @return action
 	 */
-	Consumer<Player> getExceptionHandler();
+	BiConsumer<Player, Exception> getExceptionHandler();
 
 	/**
 	 * Opens the GUI to the given player

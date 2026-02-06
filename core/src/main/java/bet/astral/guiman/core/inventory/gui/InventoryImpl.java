@@ -41,7 +41,7 @@ import java.util.function.Function;
  * Allows messenger-based translation GUIs to require only one GUI per server.
  */
 @Getter
-public class InventoryGUI implements bet.astral.guiman.api.inventory.gui.InventoryGUI {
+public class InventoryImpl implements bet.astral.guiman.api.inventory.gui.InventoryGUI {
 	@Getter(AccessLevel.NONE)
 	public static final Consumer<Player> EMPTY_CONSUMER = player -> {};
 	private final Map<Player, InteractableGUI> players = new HashMap<>();
@@ -130,7 +130,7 @@ public class InventoryGUI implements bet.astral.guiman.api.inventory.gui.Invento
 	 * @param generationExceptionPlayerHandler exception handler when trying to generate inventory for a player
 	 */
 	@ApiStatus.Internal
-	public InventoryGUI(@Nullable Component name, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> guiClickActions, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> playerClickActions, @Nullable Messenger messenger, Consumer<Player> generationExceptionPlayerHandler) {
+	public InventoryImpl(@Nullable Component name, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> guiClickActions, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> playerClickActions, @Nullable Messenger messenger, Consumer<Player> generationExceptionPlayerHandler) {
 		this.name = name;
 		this.closeConsumer = closeConsumer;
 		this.openConsumer = openConsumer;
@@ -164,7 +164,7 @@ public class InventoryGUI implements bet.astral.guiman.api.inventory.gui.Invento
 	 * @param generationExceptionPlayerHandler exception handler when trying to generate inventory for a player
 	 */
 	@ApiStatus.Internal
-	public InventoryGUI(@NotNull TranslationKey nameTranslation, @Nullable Function<Player, PlaceholderCollection> placeholderGenerator, @NotNull Messenger messenger, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> guiClickActions, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> playerClickActions, Consumer<Player> generationExceptionPlayerHandler) {
+	public InventoryImpl(@NotNull TranslationKey nameTranslation, @Nullable Function<Player, PlaceholderCollection> placeholderGenerator, @NotNull Messenger messenger, InventoryType type, int slots, Background background, Map<Integer, Collection<ClickableLike>> clickable, Consumer<Player> closeConsumer, Consumer<Player> openConsumer, boolean regenerateItems, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> guiClickActions, @NotNull Map<Integer, Map<ClickType, GlobalGUIClickAction>> playerClickActions, Consumer<Player> generationExceptionPlayerHandler) {
 		this.name = Component.translatable(nameTranslation);
 		this.nameTranslation = nameTranslation;
 		this.placeholderGenerator = placeholderGenerator != null ? placeholderGenerator : p -> new PlaceholderList();
