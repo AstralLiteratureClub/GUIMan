@@ -109,4 +109,6 @@ public interface Clickable extends DataLike, Comparable<Clickable> {
 	ItemStack generate(@NotNull Player player);
 
 	int compareTo(@NotNull Clickable clickable);
+
+	boolean isDisplayIfNoPermissions();
 }

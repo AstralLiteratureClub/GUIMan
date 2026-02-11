@@ -31,7 +31,7 @@ public class Inventory implements InventoryGUI {
 	@ApiStatus.Internal
 	private final Map<Integer, Clickable> ids = new HashMap<>();
 	@ApiStatus.Internal
-	private final Map<Player, InteractableGUI> players = new HashMap<>();
+	private final Map<Player, PlayerInventory> players = new HashMap<>();
 
 	protected final Component titleComponent;
 	protected final Map<String, Object> data;
@@ -160,29 +160,30 @@ public class Inventory implements InventoryGUI {
 	/**
 	 * Opens the GUI to a player and generates the GUI if none is found.
 	 * Uses asynchronous ways to generate inventories and open inventory in the main bukkit thread after generation
+	 *
 	 * @param player player to open to
 	 */
 	@NonBlocking
 	public void open(Player player) {
-		CompletableFuture.runAsync(()->{
+		CompletableFuture.runAsync(() -> {
 			try {
-				this.players.putIfAbsent(player, new InteractableGUI(this, player));
-				InteractableGUI gui = players.get(player);
+				this.players.putIfAbsent(player, new PlayerInventory(this, player));
+				PlayerInventory gui = players.get(player);
 				if (gui == null) {
-					gui = new InteractableGUI(this, player);
-					gui.generate(player, messenger);
-				} else if (regenerateItems) {
-					gui.generate(player, messenger);
+					gui = new PlayerInventory(this, player);
+					gui.generate(player);
+				} else if (regeneratesItemsEachOpen()) {
+					gui.generate(player);
 				}
 
-				final InteractableGUI interactableGUI = gui;
-				player.getScheduler().run(GUIManInitializer.GUIMAN.getPlugin(), t ->{
-					player.openInventory(interactableGUI.getInventory());
-				} , null);
-			} catch (Exception e){
+				final PlayerInventory inv = gui;
+				player.getScheduler().run(GUIManInitializer.GUIMAN.getPlugin(), t -> {
+					player.openInventory(inv.getInventory());
+				}, null);
+			} catch (Exception e) {
 				GUIManInitializer.GUIMAN.getPlugin().getSLF4JLogger().error("Error while trying to open GUI to {}", player.getName(), e);
 			}
-		}).exceptionally(throwable->{
+		}).exceptionally(throwable -> {
 			GUIManInitializer.GUIMAN.getPlugin().getSLF4JLogger().error("Caught exception while trying to open GUI inventory!", throwable);
 			return null;
 		});
@@ -190,17 +191,18 @@ public class Inventory implements InventoryGUI {
 
 	/**
 	 * Returns the id associated with given item stack
+	 *
 	 * @param itemStack item stack
 	 * @return id, else {@link Clickable#EMPTY}'s id
 	 */
-	public int getId(@Nullable ItemStack itemStack){
-		if (itemStack == null){
+	public int getId(@Nullable ItemStack itemStack) {
+		if (itemStack == null) {
 			return Clickable.EMPTY.getId();
 		}
 		ItemMeta meta = itemStack.getItemMeta();
 		PersistentDataContainer persistentDataContainer = meta.getPersistentDataContainer();
 		Integer id = persistentDataContainer.get(Clickable.ITEM_KEY, PersistentDataType.INTEGER);
-		if (id == null){
+		if (id == null) {
 			return Clickable.EMPTY.getId();
 		}
 		return id;

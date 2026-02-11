@@ -2,8 +2,6 @@ package bet.astral.guiman.core.inventory.internals;
 
 
 import bet.astral.guiman.core.GUIManInitializer;
-import bet.astral.guiman.core.inventory.gui.GlobalClickActionResult;
-import bet.astral.guiman.core.inventory.gui.GlobalGUIClickAction;
 import bet.astral.guiman.api.inventory.gui.InventoryGUI;
 import bet.astral.guiman.api.inventory.clickable.ClickAction;
 import bet.astral.guiman.core.inventory.clickable.ClickContext;

@@ -5,12 +5,14 @@ import bet.astral.guiman.api.inventory.clickable.ClickableBuilder;
 import bet.astral.guiman.api.inventory.gui.InventoryGUIBuilder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class GUIMan {
+	protected static GUIManHandler impl = null;
 	protected static GUIMan GUIMAN;
 	public static GUIMan getGUIMan() {
 		return GUIMAN;
@@ -20,6 +22,11 @@ public class GUIMan {
 	@UseMessenger
 	private final MessengerConfig messengerConfig;
 	private final boolean disableMessengerWarning;
+
+	@ApiStatus.Internal
+	public static void register(GUIManHandler guiManHandler) {
+		impl = guiManHandler;
+	}
 
 	public GUIMan(JavaPlugin plugin, MessengerConfig messengerConfig, boolean disableMessengerWarning) {
 		this.plugin = plugin;
@@ -81,15 +88,15 @@ public class GUIMan {
 		return plugin;
 	}
 
-	public ClickableBuilder clickableBuilder(ItemStack itemStack) {
-		return null;
+	public @NotNull ClickableBuilder clickableBuilder(ItemStack itemStack) {
+		return impl.createClickableBuilder();
 	}
 
 	public @NotNull InventoryGUIBuilder inventoryBuilder() {
-		return null;
+		return impl.createInventoryBuilder();
 	}
 
 	public MessengerConfig getMessengerConfig() {
-		return null;
+		return messengerConfig;
 	}
 }

@@ -1,10 +1,8 @@
 package bet.astral.guiman.api.inventory.gui;
 
-import bet.astral.guiman.api.DataLike;
 import bet.astral.guiman.api.GUIMan;
 import bet.astral.guiman.api.inventory.ChestRows;
 import bet.astral.guiman.api.inventory.background.Background;
-import bet.astral.guiman.api.inventory.clickable.ClickableBuilder;
 import bet.astral.guiman.api.inventory.clickable.ClickableLike;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -12,16 +10,14 @@ import org.bukkit.event.inventory.InventoryType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Builder used to configure and create an {@link InventoryGUI}.
  */
-public interface InventoryGUIBuilder extends DataLike {
+public interface InventoryGUIBuilder {
 	/**
 	 * Returns a new inventory gui builder
 	 *
@@ -167,7 +163,7 @@ public interface InventoryGUIBuilder extends DataLike {
 	 * @return this builder
 	 */
 	@NotNull
-	InventoryGUIBuilder setExceptionHandler(Consumer<Player> exceptionHandler);
+	InventoryGUIBuilder setExceptionHandler(BiConsumer<Player, Exception> exceptionHandler);
 
 	/**
 	 * Sets a data value in the clickable

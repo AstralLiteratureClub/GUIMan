@@ -1,6 +1,8 @@
 package bet.astral.guiman.core.inventory.gui.builders;
 
+import org.jetbrains.annotations.NotNull;
 
+/*
 import bet.astral.guiman.core.inventory.background.Background;
 import bet.astral.guiman.core.inventory.background.builders.BackgroundBuilder;
 import bet.astral.guiman.core.inventory.clickable.Clickable;
@@ -101,7 +103,7 @@ public class InventoryGUIPatternBuilder extends InventoryGUIBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public InventoryGUI build() {
+	public @NotNull InventoryGUI build() {
 		InventoryGUIBuilder builder = super.clone(); // Don't need this builder's state
 
 		for (int i = 0; i < 6; i++){

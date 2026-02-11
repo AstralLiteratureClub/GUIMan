@@ -1,7 +1,9 @@
 package bet.astral.guiman.core;
 
-import bet.astral.guiman.core.inventory.internals.InventoryClickListener;
+import bet.astral.guiman.api.GUIMan;
+import bet.astral.guiman.api.GUIManHandler;
 import bet.astral.guiman.api.inventory.ItemUtils;
+import bet.astral.guiman.core.inventory.listeners.InventoryClickListener;
 import bet.astral.guiman.core.inventory.utils.LItemUtils;
 import bet.astral.guiman.core.sign.SignGUI;
 import bet.astral.guiman.core.sign.SignMaterialReg;
@@ -142,6 +144,13 @@ public class GUIManInitializer {
 	public static void init(bet.astral.guiman.api.@NotNull GUIMan guiMan) {
 		guiMan.getPlugin().getServer().getPluginManager().registerEvents(new InventoryClickListener(), guiMan.getPlugin());
 		initSignMan(guiMan.getPlugin());
+
+		try {
+			Class.forName("bet.astral.messenger.v2.utils.MessageSender");
+			GUIMan.register(new GUIManHandlerImpl());
+		} catch (ClassNotFoundException e) {
+			GUIMan.register(new GUIManMessengerHandlerImpl());
+		}
 	}
 	private GUIManInitializer(JavaPlugin javaPlugin) {
 		this.plugin = javaPlugin;

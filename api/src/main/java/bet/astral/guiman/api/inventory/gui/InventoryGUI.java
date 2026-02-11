@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+
 /**
  * Represents inventory gui with actions stored within it.
  */

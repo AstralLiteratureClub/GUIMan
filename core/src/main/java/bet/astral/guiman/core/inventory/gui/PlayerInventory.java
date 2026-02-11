@@ -13,13 +13,14 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.List;
 
 /**
  * Interactable GUI which players click on.
- * Uses {@link InventoryGUI} as base and {@link bet.astral.guiman.core.inventory.listeners.InventoryClickListener} converts clicks to actions represented by {@link bet.astral.guiman.api.inventory.clickable.Clickable}
+ * Uses {@link Inventory} as base and {@link bet.astral.guiman.core.inventory.listeners.InventoryClickListener} converts clicks to actions represented by {@link bet.astral.guiman.api.inventory.clickable.Clickable}
  */
 @ApiStatus.Internal
 public class PlayerInventory implements InventoryHolder {
@@ -152,6 +153,13 @@ public class PlayerInventory implements InventoryHolder {
 		}
 	}
 
+	/**
+	 * Returns the name of the inventory
+	 * @param gui gui
+	 * @param player player
+	 * @return name
+	 */
+	@Nullable
 	protected Component getName(@NotNull Inventory gui, Player player) {
 		if (gui.getTitle() == null) {
 			return null;

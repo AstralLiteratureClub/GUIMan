@@ -2,7 +2,6 @@ package bet.astral.guiman;
 
 import bet.astral.guiman.core.GUIManInitializer;
 import bet.astral.guiman.core.inventory.clickable.Clickable;
-import bet.astral.guiman.core.inventory.gui.InventoryImpl;
 import bet.astral.guiman.api.inventory.ChestRows;
 import bet.astral.guiman.core.sign.SignGUIBuilder;
 import net.kyori.adventure.text.Component;
