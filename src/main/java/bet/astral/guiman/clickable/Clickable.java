@@ -9,7 +9,6 @@ import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.receiver.Receiver;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import bet.astral.messenger.v3.minecraft.paper.PaperMessenger;
-import de.cubbossa.translations.ComponentSplit;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemLore;
 import lombok.AccessLevel;
@@ -276,10 +275,11 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 			ItemLore lore = paperMessenger.itemLore(
 					new MessageInfoBuilder(itemLore)
 							.withPlaceholders(placeholders)
-							.withReceiver(receiver)
 							.build()
 			);
-			itemStack.setData(DataComponentTypes.LORE, lore);
+			if (lore != null) {
+				itemStack.setData(DataComponentTypes.LORE, lore);
+			}
 		}
 		return itemStack;
 	}
