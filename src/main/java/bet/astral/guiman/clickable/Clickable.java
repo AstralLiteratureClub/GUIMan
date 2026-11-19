@@ -260,7 +260,6 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 			return itemStack;
 		}
 
-		ItemMeta meta = itemStack.getItemMeta();
 		PlaceholderCollection placeholders = getPlaceholderGenerator().apply(player);
 		if (placeholders==null){
 			placeholders = new PlaceholderList();
@@ -282,7 +281,6 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 			);
 			itemStack.setData(DataComponentTypes.LORE, lore);
 		}
-		itemStack.setItemMeta(meta);
 		return itemStack;
 	}
 
