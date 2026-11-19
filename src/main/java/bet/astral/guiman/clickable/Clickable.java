@@ -8,7 +8,10 @@ import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.receiver.Receiver;
 import bet.astral.messenger.v2.translation.TranslationKey;
+import bet.astral.messenger.v3.minecraft.paper.PaperMessenger;
 import de.cubbossa.translations.ComponentSplit;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ItemLore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -264,18 +267,20 @@ public final class Clickable implements Comparable<Clickable>, ClickableLike{
 		}
 
 		if (itemName != null){
-			meta.displayName(messenger
+			Component name = messenger
 					.disablePrefixForNextParse()
-					.parseComponent(new MessageInfoBuilder(itemName).withPlaceholders(placeholders).build(), ComponentType.CHAT, receiver));
+					.parseComponent(new MessageInfoBuilder(itemName).withPlaceholders(placeholders).build(), ComponentType.CHAT, receiver);
+			itemStack.setData(DataComponentTypes.ITEM_NAME, name);
 		}
 		if (itemLore != null){
-			Component component = messenger
-					.disablePrefixForNextParse()
-					.parseComponent(new MessageInfoBuilder(itemLore)
-							.withPlaceholders(placeholders).build(), ComponentType.CHAT, receiver);
-			if (component != null){
-				meta.lore(ComponentSplit.split(component, "\n"));
-			}
+			PaperMessenger paperMessenger = (PaperMessenger) messenger;
+			ItemLore lore = paperMessenger.itemLore(
+					new MessageInfoBuilder(itemLore)
+							.withPlaceholders(placeholders)
+							.withReceiver(receiver)
+							.build()
+			);
+			itemStack.setData(DataComponentTypes.LORE, lore);
 		}
 		itemStack.setItemMeta(meta);
 		return itemStack;
